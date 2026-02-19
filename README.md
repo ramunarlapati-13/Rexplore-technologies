@@ -1,4 +1,4 @@
-# Raxplore Technologies - Company Website
+# Rexplore Technologies - Company Website
 
 A modern, premium company website built with cutting-edge design and interactive features.
 
@@ -32,7 +32,7 @@ A modern, premium company website built with cutting-edge design and interactive
 ## 📁 Project Structure
 
 ```
-Raxplore-technologies/
+Rexplore-technologies/
 ├── index.html          # Main HTML file
 ├── styles.css          # Comprehensive CSS with design system
 ├── script.js           # Interactive JavaScript functionality
@@ -189,20 +189,20 @@ vercel
 
 ## 📄 License
 
-This project is created for Raxplore Technologies. All rights reserved.
+This project is created for Rexplore Technologies. All rights reserved.
 
 ## 🤝 Support
 
 For questions or support, please contact:
-- Email: info@raxplore.tech
+- Email: info@rexplore.tech
 - Website: [Coming Soon]
 
 ## 🎉 Credits
 
-- **Design & Development**: Raxplore Technologies
+- **Design & Development**: Rexplore Technologies
 - **Fonts**: Google Fonts (Inter, Outfit)
 - **Icons**: Emoji icons (can be replaced with Font Awesome or custom SVGs)
 
 ---
 
-Built with ❤️ by Raxplore Technologies
+Built with ❤️ by Rexplore Technologies

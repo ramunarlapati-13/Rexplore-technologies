@@ -36,16 +36,16 @@ navLinks.forEach(link => {
 window.addEventListener('scroll', () => {
     let current = '';
     const sections = document.querySelectorAll('section');
-    
+
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
         const sectionHeight = section.clientHeight;
-        
+
         if (window.scrollY >= sectionTop - 200) {
             current = section.getAttribute('id');
         }
     });
-    
+
     navLinks.forEach(link => {
         link.classList.remove('active');
         if (link.getAttribute('href').substring(1) === current) {
@@ -62,7 +62,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
-        
+
         if (target) {
             const offsetTop = target.offsetTop - 80;
             window.scrollTo({
@@ -130,7 +130,7 @@ const displayScrollElement = (element) => {
     element.style.opacity = '0';
     element.style.transform = 'translateY(30px)';
     element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    
+
     if (elementInView(element)) {
         element.style.opacity = '1';
         element.style.transform = 'translateY(0)';
@@ -162,46 +162,46 @@ const formMessage = document.getElementById('formMessage');
 
 contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const formData = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
         subject: document.getElementById('subject').value,
         message: document.getElementById('message').value
     };
-    
+
     // Basic validation
     if (!formData.name || !formData.email || !formData.subject || !formData.message) {
         showFormMessage('Please fill in all fields.', 'error');
         return;
     }
-    
+
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
         showFormMessage('Please enter a valid email address.', 'error');
         return;
     }
-    
+
     // Disable submit button
     const submitBtn = contactForm.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Sending...';
     submitBtn.disabled = true;
-    
+
     // Simulate form submission (replace with actual API call)
     setTimeout(() => {
         showFormMessage('Thank you for your message! We\'ll get back to you soon.', 'success');
         contactForm.reset();
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
-        
+
         // Hide message after 5 seconds
         setTimeout(() => {
             formMessage.style.display = 'none';
         }, 5000);
     }, 1500);
-    
+
     // In production, replace the setTimeout above with actual API call:
     /*
     try {
@@ -242,23 +242,23 @@ const newsletterForm = document.getElementById('newsletterForm');
 
 newsletterForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const emailInput = newsletterForm.querySelector('input[type="email"]');
     const email = emailInput.value;
     const submitBtn = newsletterForm.querySelector('button');
-    
+
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         alert('Please enter a valid email address.');
         return;
     }
-    
+
     // Disable submit button
     const originalText = submitBtn.textContent;
     submitBtn.textContent = '✓';
     submitBtn.disabled = true;
-    
+
     // Simulate subscription (replace with actual API call)
     setTimeout(() => {
         alert('Thank you for subscribing to our newsletter!');
@@ -266,7 +266,7 @@ newsletterForm.addEventListener('submit', async (e) => {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }, 1000);
-    
+
     // In production, replace with actual API call:
     /*
     try {
@@ -300,7 +300,7 @@ newsletterForm.addEventListener('submit', async (e) => {
 window.addEventListener('scroll', () => {
     const scrolled = window.scrollY;
     const heroBackground = document.querySelector('.hero-background');
-    
+
     if (heroBackground) {
         heroBackground.style.transform = `translateY(${scrolled * 0.5}px)`;
     }
@@ -312,13 +312,13 @@ window.addEventListener('scroll', () => {
 
 const createCursorGlow = () => {
     const cards = document.querySelectorAll('.service-card, .team-card, .testimonial-card');
-    
+
     cards.forEach(card => {
         card.addEventListener('mousemove', (e) => {
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-            
+
             card.style.setProperty('--mouse-x', `${x}px`);
             card.style.setProperty('--mouse-y', `${y}px`);
         });
@@ -354,10 +354,10 @@ const typingEffect = (element, texts, speed = 100) => {
     let textIndex = 0;
     let charIndex = 0;
     let isDeleting = false;
-    
+
     const type = () => {
         const currentText = texts[textIndex];
-        
+
         if (isDeleting) {
             element.textContent = currentText.substring(0, charIndex - 1);
             charIndex--;
@@ -365,13 +365,13 @@ const typingEffect = (element, texts, speed = 100) => {
             element.textContent = currentText.substring(0, charIndex + 1);
             charIndex++;
         }
-        
+
         let typeSpeed = speed;
-        
+
         if (isDeleting) {
             typeSpeed /= 2;
         }
-        
+
         if (!isDeleting && charIndex === currentText.length) {
             typeSpeed = 2000;
             isDeleting = true;
@@ -379,10 +379,10 @@ const typingEffect = (element, texts, speed = 100) => {
             isDeleting = false;
             textIndex = (textIndex + 1) % texts.length;
         }
-        
+
         setTimeout(type, typeSpeed);
     };
-    
+
     type();
 };
 
@@ -404,10 +404,10 @@ const typingEffect = (element, texts, speed = 100) => {
 // Debounce function for scroll events
 const debounce = (func, wait = 20, immediate = true) => {
     let timeout;
-    return function() {
+    return function () {
         const context = this;
         const args = arguments;
-        const later = function() {
+        const later = function () {
             timeout = null;
             if (!immediate) func.apply(context, args);
         };
@@ -427,7 +427,7 @@ window.addEventListener('scroll', debounce(() => {
 // CONSOLE MESSAGE
 // ================================
 
-console.log('%c🚀 Raxplore Technologies', 'color: #6366f1; font-size: 24px; font-weight: bold;');
+console.log('%c🚀 Rexplore Technologies', 'color: #6366f1; font-size: 24px; font-weight: bold;');
 console.log('%cBuilt with ❤️ and cutting-edge technology', 'color: #8b5cf6; font-size: 14px;');
 console.log('%cInterested in joining our team? Visit our careers page!', 'color: #10b981; font-size: 12px;');
 
@@ -437,7 +437,7 @@ console.log('%cInterested in joining our team? Visit our careers page!', 'color:
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Website loaded successfully!');
-    
+
     // Add fade-in animation to hero on load
     const heroContent = document.querySelector('.hero-content');
     if (heroContent) {
@@ -447,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
             heroContent.style.opacity = '1';
         }, 100);
     }
-    
+
     // Trigger initial scroll animation check
     handleScrollAnimation();
 });
