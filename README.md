@@ -1,89 +1,85 @@
 # Rexplore Technologies - Company Website
 
-A modern, premium company website built with cutting-edge design and interactive features.
+A modern, premium company website built with cutting-edge design and interactive features, now powered by a real-time Firebase backend.
 
 ## 🚀 Features
 
 ### Design & Aesthetics
-- ✨ **Modern UI/UX**: Glassmorphism, gradients, and smooth animations
-- 🎨 **Premium Color Palette**: Electric blue to purple gradients with carefully chosen colors
-- 🌙 **Dark Mode**: Sleek dark theme with vibrant accents
-- 📱 **Fully Responsive**: Mobile-first design that works on all devices
-- ⚡ **Smooth Animations**: Scroll-triggered animations and micro-interactions
+- ✨ **Modern UI/UX**: Glassmorphism, gradients, and smooth animations.
+- 🎨 **Premium Color Palette**: Electric blue to purple gradients with carefully chosen colors.
+- 🌙 **Dark Mode**: Sleek dark theme with vibrant accents.
+- 📱 **Fully Responsive**: Mobile-first design that works on all devices.
+- ⚡ **Smooth Animations**: Scroll-triggered animations and micro-interactions.
+
+### Dynamic Backend (Firebase)
+- 🔥 **Real-time Firestore**: Powering testimonials, contact forms, and demo requests.
+- 🔐 **Secure Authentication**: Admin access protected by Google Sign-In.
+- 📝 **Testimonial Management**: Public feedback form with admin approval workflow.
+- 🚀 **Automated Workflows**: Integrated email notifications for admins and auto-replies for clients.
 
 ### Sections
-1. **Hero Section**: Eye-catching landing with animated statistics
-2. **About Us**: Company mission, vision, and core values
-3. **Services**: Six comprehensive service offerings
-4. **Portfolio**: Featured projects showcase
-5. **Team**: Meet the professional team members
-6. **Testimonials**: Client success stories
-7. **Contact**: Interactive contact form and company information
-8. **Footer**: Newsletter signup and quick links
-
-### Technical Features
-- 🎯 **SEO Optimized**: Proper meta tags, semantic HTML, heading structure
-- 🔄 **Interactive Elements**: Smooth scrolling, active navigation, hover effects
-- 📊 **Animated Counters**: Number animations on scroll
-- 📧 **Form Validation**: Client-side validation for contact and newsletter forms
-- 🖱️ **Parallax Effects**: Subtle parallax scrolling on hero section
-- ⚙️ **Performance Optimized**: Debounced scroll events, lazy loading support
+1. **Hero Section**: Eye-catching landing with animated statistics and primary CTAs.
+2. **About Us**: Company mission, vision, and core values.
+3. **Services**: Six comprehensive service offerings.
+4. **Portfolio**: Featured projects showcase.
+5. **Team**: Meet the professional team members.
+6. **Testimonials**: Real-time client success stories loaded from Firestore.
+7. **Book a Demo**: Dedicated portal for scheduling tailored product demonstrations.
+8. **Admin Dashboard**: Secure panel for managing site data and client requests.
 
 ## 📁 Project Structure
 
 ```
 Rexplore-technologies/
-├── index.html          # Main HTML file
-├── styles.css          # Comprehensive CSS with design system
-├── script.js           # Interactive JavaScript functionality
-├── assets/             # Images and media
-│   ├── logo.png        # Company logo
-│   ├── hero-bg.png     # Hero background
-│   ├── team-1.png      # Team member photos
-│   ├── team-2.png
-│   ├── team-3.png
-│   ├── project-webdev.png    # Portfolio images
-│   └── project-mobile.png
-└── README.md           # This file
+├── index.html            # Main Landing Page
+├── book-a-demo.html     # Demo Booking Portal
+├── admin.html           # Secure Admin Dashboard
+├── styles.css           # Global Design System & Components
+├── script.js            # Main Website Logic & Firebase Integration
+├── assets/              # Premium Media Assets
+├── firebase.json        # Firebase Hosting & Project Config
+├── firestore.rules      # Security Rules for Database
+├── .firebaserc          # Firebase Project Alias
+└── README.md            # Project Documentation
 ```
 
-## 🚀 Getting Started
+## ⚙️ Backend & Integration
 
-### Option 1: Open Directly
-Simply open `index.html` in your web browser:
+### 1. Firebase Suite
+- **Firestore**: Used as the primary database for `testimonials` and `demo_requests`.
+- **Authentication**: Google Sign-In implemented for the Admin Panel.
+- **Security Rules**: Public can write to forms, but only authorized admins (e.g., `ramunarlapati@gmail.com`) can read or manage data.
+
+### 2. External Services
+- **FormSubmit.co**: Handles background email alerts to admins when new demos are requested.
+- **EmailJS**: Provides automated, professional auto-replies to clients upon form submission.
+- **Google Fonts**: Uses 'Inter' and 'Outfit' for a premium typographic feel.
+
+## 🛠️ Admin Dashboard
+
+The admin panel (`admin.html`) provides authorized users with:
+- **Real-time Monitoring**: Instant updates of new requests.
+- **Approval Workflow**: Approve or hide testimonials before they go live.
+- **Request Tracking**: Manage the status of demo requests (Pending, Contacted, Completed).
+- **Data Management**: Securely delete or update records directly from the UI.
+
+## 🚀 Deployment
+
+### Firebase Hosting (Recommended)
 ```bash
-# Open in default browser (Windows)
-start index.html
+# Install Firebase CLI
+npm install -g firebase-tools
 
-# Or navigate to the file and double-click it
+# Login and Select Project
+firebase login
+firebase use rexploretech
+
+# Deploy Rules & Hosting
+firebase deploy
 ```
 
-### Option 2: Local Development Server
-For the best experience, use a local development server:
-
-**Using Python:**
-```bash
-# Python 3
-python -m http.server 8000
-
-# Then visit: http://localhost:8000
-```
-
-**Using Node.js (http-server):**
-```bash
-# Install http-server globally (one time)
-npm install -g http-server
-
-# Run server
-http-server
-
-# Then visit: http://localhost:8080
-```
-
-**Using VS Code Live Server:**
-1. Install the "Live Server" extension in VS Code
-2. Right-click on `index.html`
-3. Select "Open with Live Server"
+### Vercel / Netlify
+The project is optimized for static hosting platforms. Ensure your Firebase config is correctly set in `script.js` or provided via a serverless `/api/config` endpoint.
 
 ## 🎨 Customization Guide
 
@@ -94,98 +90,11 @@ Edit the CSS variables in `styles.css`:
     --primary-color: #6366f1;
     --secondary-color: #8b5cf6;
     --accent-color: #ec4899;
-    /* ... more colors */
 }
 ```
 
-### Content
-- **Company Info**: Edit text in `index.html`
-- **Team Members**: Replace images in `assets/` and update names/roles
-- **Services**: Modify service cards in the Services section
-- **Portfolio**: Update project showcases with your actual work
-
-### Fonts
-Currently using Google Fonts (Inter & Outfit). To change:
-1. Update the Google Fonts link in `index.html`
-2. Update font variables in `styles.css`
-
-## 📱 Responsive Breakpoints
-
-- **Desktop**: > 1024px
-- **Tablet**: 768px - 1024px
-- **Mobile**: < 768px
-- **Small Mobile**: < 480px
-
-## 🔧 Backend Integration
-
-### Contact Form
-The contact form currently uses a simulated submission. To integrate with a backend:
-
-1. **Replace the simulation in `script.js`** (around line 165):
-```javascript
-const response = await fetch('/api/contact', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(formData)
-});
-```
-
-2. **Popular backend options:**
-   - FormSpree
-   - EmailJS
-   - Custom Node.js/PHP backend
-   - Firebase Functions
-   - Netlify Forms
-
-### Newsletter Subscription
-Similar to the contact form, replace the simulation with your email service provider API (Mailchimp, SendGrid, etc.)
-
-## 🌐 Deployment
-
-### GitHub Pages
-```bash
-# Initialize git repository
-git init
-git add .
-git commit -m "Initial commit"
-
-# Create repository on GitHub, then:
-git remote add origin [your-repo-url]
-git push -u origin main
-
-# Enable GitHub Pages in repository settings
-```
-
-### Netlify
-1. Drag and drop the project folder to Netlify
-2. Or connect your GitHub repository
-3. Deploy automatically
-
-### Vercel
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-```
-
-## 📊 Performance Tips
-
-1. **Optimize Images**: Compress images using tools like TinyPNG or ImageOptim
-2. **Enable Caching**: Add cache headers in your server configuration
-3. **Minify Files**: Use tools to minify CSS and JavaScript for production
-4. **CDN**: Consider using a CDN for faster global delivery
-
-## 🛠️ Browser Support
-
-- ✅ Chrome (latest)
-- ✅ Firefox (latest)
-- ✅ Safari (latest)
-- ✅ Edge (latest)
-- ⚠️ IE11 (not supported)
+### Firebase Config
+Update the `firebaseConfig` object in `script.js`, `admin.html`, and `book-a-demo.html` with your actual project credentials from the Firebase Console.
 
 ## 📄 License
 
@@ -195,13 +104,7 @@ This project is created for Rexplore Technologies. All rights reserved.
 
 For questions or support, please contact:
 - Email: info@rexplore.tech
-- Website: [Coming Soon]
-
-## 🎉 Credits
-
-- **Design & Development**: Rexplore Technologies
-- **Fonts**: Google Fonts (Inter, Outfit)
-- **Icons**: Emoji icons (can be replaced with Font Awesome or custom SVGs)
+- Admin: ramunarlapati27@gmail.com
 
 ---
 
