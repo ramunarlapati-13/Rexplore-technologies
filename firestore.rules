@@ -2,10 +2,11 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    
     // Testimonials collection security
     match /testimonials/{testimonialId} {
-      // Anyone can read testimonials to view them on the site
-      allow read: if true;
+      // Public can see feedback
+      allow read: if true; 
       
       // Anyone can submit feedback, but with validation
       allow create: if request.resource.data.name != "" 
@@ -13,10 +14,22 @@ service cloud.firestore {
                    && request.resource.data.rating >= 1 
                    && request.resource.data.rating <= 5;
       
-      // Only authorized actions for deleting/updating
-      // For now, we restrict this to false to prevent unauthorized deletions.
-      // In a production app, you would use Firebase Auth.
-      allow update, delete: if false; 
+      // ONLY authenticated admins (specific email) can update or delete
+      allow update, delete: if request.auth != null && request.auth.token.email == "ramunarlapati@gmail.com"; 
+    }
+
+    // Demo requests collection security
+    match /demo_requests/{requestId} {
+      // ONLY authenticated admins (specific email) can read or delete
+      allow read, delete: if request.auth != null && request.auth.token.email == "ramunarlapati@gmail.com"; 
+      
+      // Anyone can submit a demo request
+      allow create: if request.resource.data.name != "" 
+                   && request.resource.data.email != ""
+                   && request.resource.data.interest != "";
+      
+      // ONLY authenticated admins can delete
+      allow update, delete: if request.auth != null;
     }
     
     // Default deny for everything else

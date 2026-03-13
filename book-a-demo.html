@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Demo - Rexplore Technologies</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .demo-section {
+            padding: var(--spacing-3xl) 0;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(19, 23, 41, 0.7);
+            backdrop-filter: blur(20px);
+            padding: var(--spacing-2xl);
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: var(--shadow-glow);
+            animation: fadeInScale 0.8s ease-out;
+        }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .demo-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        label {
+            font-weight: 600;
+            color: var(--primary-light);
+            font-size: 0.9rem;
+        }
+        input, select, textarea {
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: inherit;
+            transition: var(--transition-base);
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+        }
+        .submit-container {
+            grid-column: span 2;
+            margin-top: var(--spacing-md);
+        }
+        @media (max-width: 768px) {
+            .demo-form {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            .submit-container {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="assets/logo.png" alt="Rexplore Logo">
+                <span>REXPLORE</span>
+            </a>
+            <a href="index.html" class="btn btn-secondary" style="padding: 0.5rem 1.5rem;">Back Home</a>
+        </div>
+    </nav>
+
+    <section class="demo-section">
+        <div class="container">
+            <div class="demo-container">
+                <div class="section-header" style="text-align: left; margin-bottom: var(--spacing-xl);">
+                    <h2 class="section-title">Book a Personal Demo</h2>
+                    <p class="section-description">Tell us about your project interests and requirements. Our experts will prepare a tailored demonstration for you.</p>
+                </div>
+
+                <form id="demoForm" class="demo-form">
+                    <div class="form-group">
+                        <label for="fullName">Full Name *</label>
+                        <input type="text" id="fullName" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" placeholder="john@company.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="interest">Interested In *</label>
+                        <select id="interest" required>
+                            <option value="" disabled selected>Select a service</option>
+                            <option value="Web Development">Web Development</option>
+                            <option value="Mobile Apps">Mobile Apps</option>
+                            <option value="AI Solutions">AI Solutions</option>
+                            <option value="Cloud Infrastructure">Cloud Infrastructure</option>
+                            <option value="Cybersecurity">Cybersecurity</option>
+                            <option value="Other">Other Services</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="referral">Referral Code (Optional)</label>
+                        <input type="text" id="referral" placeholder="REF-123">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="requirements">Project Requirements & Interests *</label>
+                        <textarea id="requirements" rows="5" placeholder="Describe what you are looking for..." required></textarea>
+                    </div>
+                    <div class="submit-container">
+                        <button type="submit" class="btn btn-primary btn-full" id="submitBtn">Schedule My Demo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        async function initDemo() {
+            let firebaseConfig;
+            try {
+                const configRes = await fetch('/api/config');
+                if (configRes.ok) {
+                    firebaseConfig = await configRes.json();
+                } else {
+                    throw new Error();
+                }
+            } catch (e) {
+                // Fallback for local testing if not on Vercel
+                firebaseConfig = {
+                    apiKey: "AIzaSyBFL1bBugLHZ7VI9bqncqnYD_HqDkPrrC8",
+                    authDomain: "rexploretech.firebaseapp.com",
+                    projectId: "rexploretech",
+                    storageBucket: "rexploretech.firebasestorage.app",
+                    messagingSenderId: "502051542015",
+                    appId: "1:502051542015:web:a88b9d23b7be2b5aa04dca"
+                };
+            }
+
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            const demoForm = document.getElementById('demoForm');
+            const submitBtn = document.getElementById('submitBtn');
+
+            demoForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending...';
+
+                try {
+                    await addDoc(collection(db, "demo_requests"), {
+                        name: document.getElementById('fullName').value,
+                        email: document.getElementById('email').value,
+                        interest: document.getElementById('interest').value,
+                        referral: document.getElementById('referral').value || 'none',
+                        requirements: document.getElementById('requirements').value,
+                        timestamp: serverTimestamp()
+                    });
+
+                    alert('Demo request sent successfully! We will contact you soon.');
+                    demoForm.reset();
+                } catch (err) {
+                    console.error(err);
+                    alert('Error sending request. Please try again.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Schedule My Demo';
+                }
+            });
+        }
+
+        initDemo();
+    </script>
+</body>
+</html>

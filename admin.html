@@ -6,9 +6,41 @@
     <title>Admin Dashboard - Rexplore</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        body { background: var(--bg-primary); color: var(--text-primary); padding: 2rem; }
+        body { background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+        
+        /* Login Styles */
+        #loginContainer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .login-card {
+            background: rgba(19, 23, 41, 0.7);
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-glow);
+            animation: fadeInScale 0.6s ease-out;
+        }
+        .login-card h2 { margin-bottom: 2rem; text-align: center; color: var(--primary-light); }
+        .form-group { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-group label { font-size: 0.9rem; font-weight: 600; }
+        .form-group input { 
+            padding: 1rem; 
+            background: var(--bg-tertiary); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: var(--radius-md); 
+            color: white; 
+        }
+
+        /* Dashboard Styles */
+        #adminDashboard { display: none; padding: 2rem; }
         .admin-container { max-width: 1000px; margin: 0 auto; }
-        .testimonial-item { 
+        .admin-item { 
             background: var(--bg-secondary); 
             padding: 1.5rem; 
             margin-bottom: 1rem; 
@@ -18,8 +50,10 @@
             justify-content: space-between;
             align-items: center;
         }
-        .testimonial-info h4 { margin: 0; color: var(--primary-light); }
-        .testimonial-info p { margin: 0.5rem 0 0; color: var(--text-secondary); font-style: italic; }
+        .item-info h4 { margin: 0; color: var(--primary-light); }
+        .item-info p { margin: 0.5rem 0 0; color: var(--text-secondary); }
+        .item-info .meta { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.5rem; }
+        
         .delete-btn {
             background: #ef4444;
             color: white;
@@ -29,95 +63,202 @@
             cursor: pointer;
         }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        
+        .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; }
+        .tab-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; font-weight: 600; padding: 0.5rem 1rem; transition: var(--transition-base); }
+        .tab-btn.active { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); }
+        
+        .data-list { display: none; }
+        .data-list.active { display: block; }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body>
-    <div class="admin-container">
-        <div class="header">
-            <h1>Testimonials Admin</h1>
-            <a href="index.html" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Back to Site</a>
+    <!-- Login Section -->
+    <div id="loginContainer">
+        <div class="login-card">
+            <h2>Admin Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="adminEmail" placeholder="ramunarlapati@gmail.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="adminPass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full" id="loginBtn">Sign In</button>
+            </form>
+            <p style="text-align: center; margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-muted);">
+                Authorized Personnel Only
+            </p>
         </div>
-        <div id="adminTestimonials">
-            <p>Verifying access...</p>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="adminDashboard">
+        <div class="admin-container">
+            <div class="header">
+                <h1>Rexplore Admin</h1>
+                <div style="display: flex; gap: 1rem;">
+                    <button id="logoutBtn" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Logout</button>
+                    <a href="index.html" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Back to Site</a>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-target="testimonialsList">Testimonials</button>
+                <button class="tab-btn" data-target="demoList">Demo Requests</button>
+            </div>
+
+            <div id="testimonialsList" class="data-list active">
+                <p>Loading testimonials...</p>
+            </div>
+
+            <div id="demoList" class="data-list">
+                <p>Loading demo requests...</p>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, query, orderBy, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        async function initAdmin() {
+        let db, auth;
+
+        async function init() {
             try {
-                // 1. Fetch Config Securely from Serverless API
                 const configRes = await fetch('/api/config');
                 if (!configRes.ok) throw new Error("Config API error");
                 const firebaseConfig = await configRes.json();
 
-                // 2. Verify Password Securely via Serverless API
-                const password = prompt("Enter Admin Password:");
-                const verifyRes = await fetch('/api/verify', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password })
-                });
-                const auth = await verifyRes.json();
-
-                if (!auth.success) {
-                    alert("Unauthorized access.");
-                    window.location.href = "index.html";
-                    return;
-                }
-
-                // Initialize Firebase
                 const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
-                
-                // Load UI
-                loadTestimonials(db);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Check Auth State
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        showDashboard();
+                    } else {
+                        showLogin();
+                    }
+                });
+
+                // Login Handler
+                document.getElementById('loginForm').onsubmit = async (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('adminEmail').value;
+                    const pass = document.getElementById('adminPass').value;
+                    const btn = document.getElementById('loginBtn');
+                    
+                    btn.disabled = true;
+                    btn.textContent = 'Verifying...';
+
+                    try {
+                        await signInWithEmailAndPassword(auth, email, pass);
+                    } catch (err) {
+                        alert("Login failed: " + err.message);
+                        btn.disabled = false;
+                        btn.textContent = 'Sign In';
+                    }
+                };
+
+                // Logout Handler
+                document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
             } catch (err) {
-                console.error("Initialization error:", err);
-                document.getElementById('adminTestimonials').innerHTML = "<p>Error loading configuration. Ensure you are running on Vercel or local server with API support.</p>";
+                console.error(err);
+                alert("Critical error: " + err.message);
             }
         }
 
-        function loadTestimonials(db) {
-            const adminContainer = document.getElementById('adminTestimonials');
-            const q = query(collection(db, "testimonials"), orderBy("timestamp", "desc"));
+        function showDashboard() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'block';
+            setupTabs();
+            loadData("testimonials", "testimonialsList");
+            loadData("demo_requests", "demoList");
+        }
+
+        function showLogin() {
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('adminDashboard').style.display = 'none';
+        }
+
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.onclick = () => {
+                    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.data-list').forEach(l => l.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.target).classList.add('active');
+                };
+            });
+        }
+
+        function loadData(collectionName, containerId) {
+            const container = document.getElementById(containerId);
+            const q = query(collection(db, collectionName), orderBy("timestamp", "desc"));
             
             onSnapshot(q, (snapshot) => {
-                adminContainer.innerHTML = '';
+                container.innerHTML = '';
                 if (snapshot.empty) {
-                    adminContainer.innerHTML = '<p>No feedback found.</p>';
+                    container.innerHTML = `<p>No ${collectionName.replace('_',' ')} found.</p>`;
                     return;
                 }
                 snapshot.forEach((docData) => {
                     const data = docData.data();
                     const id = docData.id;
                     const div = document.createElement('div');
-                    div.className = 'testimonial-item';
+                    div.className = 'admin-item';
+                    
+                    let content = '';
+                    if (collectionName === "testimonials") {
+                        content = `
+                            <div class="item-info">
+                                <h4>${data.name} (${data.rating} Stars)</h4>
+                                <p>"${data.text}"</p>
+                                <div class="meta">${data.timestamp?.toDate().toLocaleString() || ''}</div>
+                            </div>
+                        `;
+                    } else {
+                        content = `
+                            <div class="item-info">
+                                <h4>${data.name} - ${data.interest}</h4>
+                                <p><strong>Email:</strong> ${data.email}</p>
+                                <p><strong>Requirements:</strong> ${data.requirements}</p>
+                                <p><strong>Referral:</strong> ${data.referral}</p>
+                                <div class="meta">${data.timestamp?.toDate().toLocaleString() || ''}</div>
+                            </div>
+                        `;
+                    }
+                    
                     div.innerHTML = `
-                        <div class="testimonial-info">
-                            <h4>${data.name} (${data.rating} Stars)</h4>
-                            <p>"${data.text}"</p>
-                            <small style="color: var(--text-muted)">${data.timestamp?.toDate().toLocaleString() || ''}</small>
-                        </div>
-                        <button class="delete-btn" data-id="${id}">Delete</button>
+                        ${content}
+                        <button class="delete-btn" data-id="${id}" data-col="${collectionName}">Delete</button>
                     `;
-                    adminContainer.appendChild(div);
+                    container.appendChild(div);
                 });
 
-                document.querySelectorAll('.delete-btn').forEach(btn => {
+                container.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.onclick = async () => {
-                        if (confirm('Delete this feedback?')) {
-                            await deleteDoc(doc(db, "testimonials", btn.dataset.id));
+                        if (confirm('Delete this record?')) {
+                            await deleteDoc(doc(db, btn.dataset.col, btn.dataset.id));
                         }
                     };
                 });
             });
         }
 
-        // Run when page loads
-        initAdmin();
+        init();
     </script>
 </body>
 </html>
