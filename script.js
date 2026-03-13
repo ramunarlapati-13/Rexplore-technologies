@@ -435,7 +435,7 @@ console.log('%cInterested in joining our team? Visit our careers page!', 'color:
 // FIREBASE & TESTIMONIALS
 // ================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, where, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 1. Fetch Config Securely from Serverless API (with Local Fallback)
 let firebaseConfig;
@@ -462,7 +462,12 @@ const db = getFirestore(app);
 // Dynamic Testimonials Loading
 const testimonialsGrid = document.getElementById('testimonialsGrid');
 if (testimonialsGrid) {
-    const q = query(collection(db, "testimonials"), orderBy("timestamp", "desc"), limit(6));
+    // Only show "approved" testimonials on the main site
+    const q = query(
+        collection(db, "testimonials"), 
+        where("status", "==", "approved"),
+        limit(6)
+    );
     onSnapshot(q, (snapshot) => {
         // Keep some static ones if empty, but clear for real data
         if (!snapshot.empty) {
@@ -485,6 +490,8 @@ if (testimonialsGrid) {
                 testimonialsGrid.appendChild(card);
             });
         }
+    }, (error) => {
+        console.error("Testimonials load error:", error);
     });
 }
 
@@ -530,6 +537,7 @@ if (feedbackForm) {
                 name: document.getElementById('feedbackName').value,
                 text: document.getElementById('feedbackText').value,
                 rating: parseInt(currentRating),
+                status: 'pending', // Default to pending until admin approves
                 timestamp: serverTimestamp()
             });
             feedbackForm.reset();

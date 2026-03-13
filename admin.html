@@ -201,7 +201,8 @@
 
         function loadData(collectionName, containerId) {
             const container = document.getElementById(containerId);
-            const q = query(collection(db, collectionName), orderBy("timestamp", "desc"));
+            // Start with a simple query avoid index requirements initially
+            const q = collection(db, collectionName);
             
             onSnapshot(q, (snapshot) => {
                 container.innerHTML = '';
@@ -215,12 +216,20 @@
                     const div = document.createElement('div');
                     div.className = 'admin-item';
                     
-                    let content = '';
+                    let content;
                     if (collectionName === "testimonials") {
                         content = `
                             <div class="item-info">
                                 <h4>${data.name} (${data.rating} Stars)</h4>
                                 <p>"${data.text}"</p>
+                                <div style="margin: 10px 0;">
+                                    <strong>Display Status:</strong> 
+                                    <select class="status-update" data-id="${id}" data-col="testimonials" style="padding: 5px; background: var(--bg-tertiary); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;">
+                                        <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                        <option value="approved" ${data.status === 'approved' ? 'selected' : ''}>Approved (Public)</option>
+                                        <option value="hidden" ${data.status === 'hidden' ? 'selected' : ''}>Hidden</option>
+                                    </select>
+                                </div>
                                 <div class="meta">${data.timestamp?.toDate().toLocaleString() || ''}</div>
                             </div>
                         `;
@@ -234,7 +243,7 @@
                                 <p><strong>Referral:</strong> ${data.referral}</p>
                                 <div style="margin: 10px 0;">
                                     <strong>Status:</strong> 
-                                    <select class="status-update" data-id="${id}" style="padding: 5px; background: var(--bg-tertiary); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;">
+                                    <select class="status-update" data-id="${id}" data-col="demo_requests" style="padding: 5px; background: var(--bg-tertiary); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;">
                                         <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>Pending</option>
                                         <option value="contacted" ${data.status === 'contacted' ? 'selected' : ''}>Contacted</option>
                                         <option value="completed" ${data.status === 'completed' ? 'selected' : ''}>Completed</option>
@@ -257,8 +266,9 @@
                     select.onchange = async () => {
                         const newStatus = select.value;
                         const docId = select.dataset.id;
+                        const colName = select.dataset.col;
                         try {
-                            await updateDoc(doc(db, "demo_requests", docId), { status: newStatus });
+                            await updateDoc(doc(db, colName, docId), { status: newStatus });
                             alert('Status updated successfully!');
                         } catch (err) {
                             alert('Error updating status: ' + err.message);
@@ -273,6 +283,9 @@
                         }
                     };
                 });
+            }, (error) => {
+                console.error("Error loading " + collectionName + ":", error);
+                container.innerHTML = `<p style="color: #ff4757; padding: 20px; background: rgba(255,0,0,0.1); border-radius: 8px;">Error loading data: ${error.message}</p>`;
             });
         }
 
