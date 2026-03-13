@@ -21,7 +21,10 @@
   },
   "auth": {
     "providers": {
-      "emailPassword": true
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Rexplore Technologies",
+        "supportEmail": "ramunarlapati@gmail.com"
+      }
     }
   }
 }

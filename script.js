@@ -437,12 +437,24 @@ console.log('%cInterested in joining our team? Visit our careers page!', 'color:
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 1. Fetch Config Securely from Serverless API
-const configRes = await fetch('/api/config');
-if (!configRes.ok) {
-    throw new Error("Could not load Firebase configuration. If developing locally, use 'vercel dev'.");
+// 1. Fetch Config Securely from Serverless API (with Local Fallback)
+let firebaseConfig;
+try {
+    const configRes = await fetch('/api/config');
+    if (!configRes.ok) throw new Error("API not available");
+    firebaseConfig = await configRes.json();
+} catch (err) {
+    // Fallback for local development using npx serve or simple static server
+    firebaseConfig = {
+        apiKey: "AIzaSyD4g3gRYXMI1qtGg8XEZdJWmMkSLQiIaXU",
+        authDomain: "rexplore-tech-web-1337.firebaseapp.com",
+        projectId: "rexplore-tech-web-1337",
+        storageBucket: "rexplore-tech-web-1337.firebasestorage.app",
+        messagingSenderId: "564037030165",
+        appId: "1:564037030165:web:4a4fbb921cc8b02a73d91c"
+    };
+    console.log("Using local fallback config");
 }
-const firebaseConfig = await configRes.json();
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -490,6 +502,21 @@ ratingStars.forEach(star => {
     };
 });
 
+// Modal Control
+window.showModal = (title, message) => {
+    const modal = document.getElementById('successModal');
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalMessage').textContent = message;
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('active'), 10);
+};
+
+window.closeModal = () => {
+    const modal = document.getElementById('successModal');
+    modal.classList.remove('active');
+    setTimeout(() => modal.style.display = 'none', 300);
+};
+
 if (feedbackForm) {
     feedbackForm.onsubmit = async (e) => {
         e.preventDefault();
@@ -506,10 +533,14 @@ if (feedbackForm) {
                 timestamp: serverTimestamp()
             });
             feedbackForm.reset();
-            alert('Thank you for your feedback!');
+            showModal('Thank You!', 'Your feedback has been received and added to our wall of love.');
         } catch (err) {
             console.error(err);
-            alert('Error submitting feedback. Please try again.');
+            if (err.message.includes('permission-denied')) {
+                alert('Database Access Error: Your Firestore Security Rules may not be deployed. Please run "firebase deploy --only firestore:rules" in your terminal.');
+            } else {
+                alert('Submission failed: ' + err.message);
+            }
         } finally {
             btn.disabled = false;
             btn.textContent = originalText;

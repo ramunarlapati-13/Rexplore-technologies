@@ -82,17 +82,10 @@
     <div id="loginContainer">
         <div class="login-card">
             <h2>Admin Login</h2>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="adminEmail" placeholder="ramunarlapati@gmail.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="adminPass" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-full" id="loginBtn">Sign In</button>
-            </form>
+            <button id="googleLoginBtn" class="btn btn-primary btn-full" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="Google">
+                Sign in with Google
+            </button>
             <p style="text-align: center; margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-muted);">
                 Authorized Personnel Only
             </p>
@@ -127,46 +120,54 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, query, orderBy, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         let db, auth;
 
         async function init() {
             try {
-                const configRes = await fetch('/api/config');
-                if (!configRes.ok) throw new Error("Config API error");
-                const firebaseConfig = await configRes.json();
+                // 1. Fetch Config with Local Fallback
+                let firebaseConfig;
+                try {
+                    const configRes = await fetch('/api/config');
+                    if (!configRes.ok) throw new Error();
+                    firebaseConfig = await configRes.json();
+                } catch (e) {
+                    firebaseConfig = {
+                        apiKey: "AIzaSyD4g3gRYXMI1qtGg8XEZdJWmMkSLQiIaXU",
+                        authDomain: "rexplore-tech-web-1337.firebaseapp.com",
+                        projectId: "rexplore-tech-web-1337",
+                        storageBucket: "rexplore-tech-web-1337.firebasestorage.app",
+                        messagingSenderId: "564037030165",
+                        appId: "1:564037030165:web:4a4fbb921cc8b02a73d91c"
+                    };
+                }
 
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
+                const provider = new GoogleAuthProvider();
 
                 // Check Auth State
                 onAuthStateChanged(auth, (user) => {
-                    if (user) {
+                    if (user && user.email === "ramunarlapati@gmail.com") {
                         showDashboard();
+                    } else if (user) {
+                        // User logged in but not the admin
+                        alert("Unauthorized account: " + user.email);
+                        signOut(auth);
                     } else {
                         showLogin();
                     }
                 });
 
-                // Login Handler
-                document.getElementById('loginForm').onsubmit = async (e) => {
-                    e.preventDefault();
-                    const email = document.getElementById('adminEmail').value;
-                    const pass = document.getElementById('adminPass').value;
-                    const btn = document.getElementById('loginBtn');
-                    
-                    btn.disabled = true;
-                    btn.textContent = 'Verifying...';
-
+                // Google Login Handler
+                document.getElementById('googleLoginBtn').onclick = async () => {
                     try {
-                        await signInWithEmailAndPassword(auth, email, pass);
+                        await signInWithPopup(auth, provider);
                     } catch (err) {
                         alert("Login failed: " + err.message);
-                        btn.disabled = false;
-                        btn.textContent = 'Sign In';
                     }
                 };
 
@@ -233,9 +234,19 @@
                         content = `
                             <div class="item-info">
                                 <h4>${data.name} - ${data.interest}</h4>
+                                <p><strong>ID:</strong> <code style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:3px;">${id}</code></p>
                                 <p><strong>Email:</strong> ${data.email}</p>
                                 <p><strong>Requirements:</strong> ${data.requirements}</p>
                                 <p><strong>Referral:</strong> ${data.referral}</p>
+                                <div style="margin: 10px 0;">
+                                    <strong>Status:</strong> 
+                                    <select class="status-update" data-id="${id}" style="padding: 5px; background: var(--bg-tertiary); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;">
+                                        <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                        <option value="contacted" ${data.status === 'contacted' ? 'selected' : ''}>Contacted</option>
+                                        <option value="completed" ${data.status === 'completed' ? 'selected' : ''}>Completed</option>
+                                        <option value="rejected" ${data.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+                                    </select>
+                                </div>
                                 <div class="meta">${data.timestamp?.toDate().toLocaleString() || ''}</div>
                             </div>
                         `;
@@ -246,6 +257,19 @@
                         <button class="delete-btn" data-id="${id}" data-col="${collectionName}">Delete</button>
                     `;
                     container.appendChild(div);
+                });
+
+                container.querySelectorAll('.status-update').forEach(select => {
+                    select.onchange = async () => {
+                        const newStatus = select.value;
+                        const docId = select.dataset.id;
+                        try {
+                            await updateDoc(doc(db, "demo_requests", docId), { status: newStatus });
+                            alert('Status updated successfully!');
+                        } catch (err) {
+                            alert('Error updating status: ' + err.message);
+                        }
+                    };
                 });
 
                 container.querySelectorAll('.delete-btn').forEach(btn => {

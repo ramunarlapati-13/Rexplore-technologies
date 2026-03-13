@@ -141,21 +141,19 @@
             let firebaseConfig;
             try {
                 const configRes = await fetch('/api/config');
-                if (configRes.ok) {
-                    firebaseConfig = await configRes.json();
-                } else {
-                    throw new Error();
-                }
-            } catch (e) {
-                // Fallback for local testing if not on Vercel
+                if (!configRes.ok) throw new Error("API not available");
+                firebaseConfig = await configRes.json();
+            } catch (err) {
+                // Fallback for local development using npx serve
                 firebaseConfig = {
-                    apiKey: "AIzaSyBFL1bBugLHZ7VI9bqncqnYD_HqDkPrrC8",
-                    authDomain: "rexploretech.firebaseapp.com",
-                    projectId: "rexploretech",
-                    storageBucket: "rexploretech.firebasestorage.app",
-                    messagingSenderId: "502051542015",
-                    appId: "1:502051542015:web:a88b9d23b7be2b5aa04dca"
+                    apiKey: "AIzaSyD4g3gRYXMI1qtGg8XEZdJWmMkSLQiIaXU",
+                    authDomain: "rexplore-tech-web-1337.firebaseapp.com",
+                    projectId: "rexplore-tech-web-1337",
+                    storageBucket: "rexplore-tech-web-1337.firebasestorage.app",
+                    messagingSenderId: "564037030165",
+                    appId: "1:564037030165:web:4a4fbb921cc8b02a73d91c"
                 };
+                console.log("Using local fallback config");
             }
 
             const app = initializeApp(firebaseConfig);
@@ -169,21 +167,35 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Sending...';
 
+                // Modal Control
+                window.showModal = (id) => {
+                    const modal = document.getElementById('successModal');
+                    const message = document.getElementById('modalMessage');
+                    message.innerHTML = `Your demo request has been submitted successfully.<br><br><strong>Your Tracking ID:</strong> <code style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:4px; font-family:monospace;">${id}</code><br><br>We will contact you shortly.`;
+                    modal.style.display = 'flex';
+                    setTimeout(() => modal.classList.add('active'), 10);
+                };
+
                 try {
-                    await addDoc(collection(db, "demo_requests"), {
+                    const docRef = await addDoc(collection(db, "demo_requests"), {
                         name: document.getElementById('fullName').value,
                         email: document.getElementById('email').value,
                         interest: document.getElementById('interest').value,
                         referral: document.getElementById('referral').value || 'none',
                         requirements: document.getElementById('requirements').value,
+                        status: 'pending',
                         timestamp: serverTimestamp()
                     });
 
-                    alert('Demo request sent successfully! We will contact you soon.');
                     demoForm.reset();
+                    showModal(docRef.id);
                 } catch (err) {
                     console.error(err);
-                    alert('Error sending request. Please try again.');
+                    if (err.message.includes('permission-denied')) {
+                        alert('Database Access Error: Your Firestore Security Rules may not be deployed. Please run "firebase deploy --only firestore:rules" in your terminal.');
+                    } else {
+                        alert('Error: ' + err.message);
+                    }
                 } finally {
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Schedule My Demo';
@@ -193,5 +205,14 @@
 
         initDemo();
     </script>
+    <!-- Success Modal -->
+    <div id="successModal" class="success-modal">
+        <div class="modal-content">
+            <div class="modal-icon">✓</div>
+            <h3 id="modalTitle">Request Received!</h3>
+            <p id="modalMessage">Your demo request has been submitted successfully.</p>
+            <button class="modal-btn" onclick="location.href='index.html'">Back to Home</button>
+        </div>
+    </div>
 </body>
 </html>
