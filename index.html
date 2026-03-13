@@ -342,7 +342,7 @@
                 <h2 class="section-title">What Our Clients Say</h2>
                 <p class="section-description">Real feedback from businesses we've helped transform</p>
             </div>
-            <div class="testimonials-grid">
+            <div class="testimonials-grid" id="testimonialsGrid">
                 <div class="testimonial-card">
                     <div class="testimonial-rating">
                         ⭐⭐⭐⭐⭐
@@ -384,6 +384,26 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Feedback Form Block -->
+            <div class="feedback-container">
+                <div class="section-header">
+                    <h3>Share Your Feedback</h3>
+                    <p>We value your opinion! Let us know about your experience.</p>
+                </div>
+                <form id="feedbackForm" class="feedback-form">
+                    <div class="rating-input">
+                        <span class="star-input" data-value="1">★</span>
+                        <span class="star-input" data-value="2">★</span>
+                        <span class="star-input" data-value="3">★</span>
+                        <span class="star-input" data-value="4">★</span>
+                        <span class="star-input" data-value="5">★</span>
+                    </div>
+                    <input type="text" id="feedbackName" placeholder="Your Name" required>
+                    <textarea id="feedbackText" placeholder="Your Feedback" rows="3" required></textarea>
+                    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                </form>
             </div>
         </div>
     </section>
@@ -490,7 +510,7 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 
 </html>

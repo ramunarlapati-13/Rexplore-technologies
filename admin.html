@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Rexplore</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: var(--bg-primary); color: var(--text-primary); padding: 2rem; }
+        .admin-container { max-width: 1000px; margin: 0 auto; }
+        .testimonial-item { 
+            background: var(--bg-secondary); 
+            padding: 1.5rem; 
+            margin-bottom: 1rem; 
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .testimonial-info h4 { margin: 0; color: var(--primary-light); }
+        .testimonial-info p { margin: 0.5rem 0 0; color: var(--text-secondary); font-style: italic; }
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="header">
+            <h1>Testimonials Admin</h1>
+            <a href="index.html" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Back to Site</a>
+        </div>
+        <div id="adminTestimonials">
+            <p>Verifying access...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        async function initAdmin() {
+            try {
+                // 1. Fetch Config Securely from Serverless API
+                const configRes = await fetch('/api/config');
+                if (!configRes.ok) throw new Error("Config API error");
+                const firebaseConfig = await configRes.json();
+
+                // 2. Verify Password Securely via Serverless API
+                const password = prompt("Enter Admin Password:");
+                const verifyRes = await fetch('/api/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                const auth = await verifyRes.json();
+
+                if (!auth.success) {
+                    alert("Unauthorized access.");
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                // Initialize Firebase
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                
+                // Load UI
+                loadTestimonials(db);
+            } catch (err) {
+                console.error("Initialization error:", err);
+                document.getElementById('adminTestimonials').innerHTML = "<p>Error loading configuration. Ensure you are running on Vercel or local server with API support.</p>";
+            }
+        }
+
+        function loadTestimonials(db) {
+            const adminContainer = document.getElementById('adminTestimonials');
+            const q = query(collection(db, "testimonials"), orderBy("timestamp", "desc"));
+            
+            onSnapshot(q, (snapshot) => {
+                adminContainer.innerHTML = '';
+                if (snapshot.empty) {
+                    adminContainer.innerHTML = '<p>No feedback found.</p>';
+                    return;
+                }
+                snapshot.forEach((docData) => {
+                    const data = docData.data();
+                    const id = docData.id;
+                    const div = document.createElement('div');
+                    div.className = 'testimonial-item';
+                    div.innerHTML = `
+                        <div class="testimonial-info">
+                            <h4>${data.name} (${data.rating} Stars)</h4>
+                            <p>"${data.text}"</p>
+                            <small style="color: var(--text-muted)">${data.timestamp?.toDate().toLocaleString() || ''}</small>
+                        </div>
+                        <button class="delete-btn" data-id="${id}">Delete</button>
+                    `;
+                    adminContainer.appendChild(div);
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.onclick = async () => {
+                        if (confirm('Delete this feedback?')) {
+                            await deleteDoc(doc(db, "testimonials", btn.dataset.id));
+                        }
+                    };
+                });
+            });
+        }
+
+        // Run when page loads
+        initAdmin();
+    </script>
+</body>
+</html>

@@ -432,22 +432,95 @@ console.log('%cBuilt with ❤️ and cutting-edge technology', 'color: #8b5cf6; 
 console.log('%cInterested in joining our team? Visit our careers page!', 'color: #10b981; font-size: 12px;');
 
 // ================================
+// FIREBASE & TESTIMONIALS
+// ================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// 1. Fetch Config Securely from Serverless API
+const configRes = await fetch('/api/config');
+if (!configRes.ok) {
+    throw new Error("Could not load Firebase configuration. If developing locally, use 'vercel dev'.");
+}
+const firebaseConfig = await configRes.json();
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Dynamic Testimonials Loading
+const testimonialsGrid = document.getElementById('testimonialsGrid');
+if (testimonialsGrid) {
+    const q = query(collection(db, "testimonials"), orderBy("timestamp", "desc"), limit(6));
+    onSnapshot(q, (snapshot) => {
+        // Keep some static ones if empty, but clear for real data
+        if (!snapshot.empty) {
+            testimonialsGrid.innerHTML = '';
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const stars = '⭐'.repeat(data.rating || 5);
+                const card = document.createElement('div');
+                card.className = 'testimonial-card';
+                card.innerHTML = `
+                    <div class="testimonial-rating">${stars}</div>
+                    <p class="testimonial-text">"${data.text}"</p>
+                    <div class="testimonial-author">
+                        <div class="author-info">
+                            <h4>${data.name}</h4>
+                            <p>Client</p>
+                        </div>
+                    </div>
+                `;
+                testimonialsGrid.appendChild(card);
+            });
+        }
+    });
+}
+
+// Feedback Form Logic
+const feedbackForm = document.getElementById('feedbackForm');
+const ratingStars = document.querySelectorAll('.star-input');
+let currentRating = 5;
+
+ratingStars.forEach(star => {
+    star.onclick = () => {
+        currentRating = star.dataset.value;
+        ratingStars.forEach(s => {
+            s.style.color = s.dataset.value <= currentRating ? '#f59e0b' : '#475569';
+        });
+    };
+});
+
+if (feedbackForm) {
+    feedbackForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = feedbackForm.querySelector('button');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+
+        try {
+            await addDoc(collection(db, "testimonials"), {
+                name: document.getElementById('feedbackName').value,
+                text: document.getElementById('feedbackText').value,
+                rating: parseInt(currentRating),
+                timestamp: serverTimestamp()
+            });
+            feedbackForm.reset();
+            alert('Thank you for your feedback!');
+        } catch (err) {
+            console.error(err);
+            alert('Error submitting feedback. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    };
+}
+
+// ================================
 // INITIALIZE
 // ================================
-
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Website loaded successfully!');
-
-    // Add fade-in animation to hero on load
-    const heroContent = document.querySelector('.hero-content');
-    if (heroContent) {
-        heroContent.style.opacity = '0';
-        setTimeout(() => {
-            heroContent.style.transition = 'opacity 1s ease';
-            heroContent.style.opacity = '1';
-        }, 100);
-    }
-
-    // Trigger initial scroll animation check
     handleScrollAnimation();
 });

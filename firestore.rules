@@ -1,0 +1,27 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Testimonials collection security
+    match /testimonials/{testimonialId} {
+      // Anyone can read testimonials to view them on the site
+      allow read: if true;
+      
+      // Anyone can submit feedback, but with validation
+      allow create: if request.resource.data.name != "" 
+                   && request.resource.data.text != ""
+                   && request.resource.data.rating >= 1 
+                   && request.resource.data.rating <= 5;
+      
+      // Only authorized actions for deleting/updating
+      // For now, we restrict this to false to prevent unauthorized deletions.
+      // In a production app, you would use Firebase Auth.
+      allow update, delete: if false; 
+    }
+    
+    // Default deny for everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
