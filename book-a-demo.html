@@ -99,15 +99,15 @@
                 <form id="demoForm" class="demo-form">
                     <div class="form-group">
                         <label for="fullName">Full Name *</label>
-                        <input type="text" id="fullName" placeholder="John Doe" required>
+                        <input type="text" id="fullName" name="name" placeholder="John Doe" required>
                     </div>
                     <div class="form-group">
                         <label for="email">Email Address *</label>
-                        <input type="email" id="email" placeholder="john@company.com" required>
+                        <input type="email" id="email" name="email" placeholder="john@company.com" required>
                     </div>
                     <div class="form-group">
                         <label for="interest">Interested In *</label>
-                        <select id="interest" required>
+                        <select id="interest" name="interest" required>
                             <option value="" disabled selected>Select a service</option>
                             <option value="Web Development">Web Development</option>
                             <option value="Mobile Apps">Mobile Apps</option>
@@ -119,11 +119,11 @@
                     </div>
                     <div class="form-group">
                         <label for="referral">Referral Code (Optional)</label>
-                        <input type="text" id="referral" placeholder="REF-123">
+                        <input type="text" id="referral" name="referral" placeholder="REF-123">
                     </div>
                     <div class="form-group full-width">
                         <label for="requirements">Project Requirements & Interests *</label>
-                        <textarea id="requirements" rows="5" placeholder="Describe what you are looking for..." required></textarea>
+                        <textarea id="requirements" name="requirements" rows="5" placeholder="Describe what you are looking for..." required></textarea>
                     </div>
                     <div class="submit-container">
                         <button type="submit" class="btn btn-primary btn-full" id="submitBtn">Schedule My Demo</button>
@@ -177,7 +177,7 @@
                 };
 
                 try {
-                    const docRef = await addDoc(collection(db, "demo_requests"), {
+                    const demoData = {
                         name: document.getElementById('fullName').value,
                         email: document.getElementById('email').value,
                         interest: document.getElementById('interest').value,
@@ -185,7 +185,30 @@
                         requirements: document.getElementById('requirements').value,
                         status: 'pending',
                         timestamp: serverTimestamp()
-                    });
+                    };
+
+                    // 1. Save to Firebase (for Dashboard)
+                    const docRef = await addDoc(collection(db, "demo_requests"), demoData);
+
+                    // 2. Send Background Email Alert (Zero-Setup FormSubmit)
+                    try {
+                        fetch("https://formsubmit.co/ajax/ramunarlapati27@gmail.com", {
+                            method: "POST",
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                            body: JSON.stringify({
+                                _subject: "🚀 New Demo Request from " + demoData.name,
+                                "Customer Name": demoData.name,
+                                "Email Address": demoData.email,
+                                "Service Interest": demoData.interest,
+                                "Referral Source": demoData.referral,
+                                "Message/Requirements": demoData.requirements,
+                                "Internal Tracking ID": docRef.id,
+                                _template: "table" // This makes the Gmail look like a professional form result
+                            })
+                        });
+                    } catch (emailErr) {
+                        console.log("Email background skip:", emailErr);
+                    }
 
                     demoForm.reset();
                     showModal(docRef.id);
