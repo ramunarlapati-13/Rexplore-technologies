@@ -127,22 +127,16 @@
 
         async function init() {
             try {
-                // 1. Fetch Config with Local Fallback
-                let firebaseConfig;
-                try {
-                    const configRes = await fetch('/api/config');
-                    if (!configRes.ok) throw new Error();
-                    firebaseConfig = await configRes.json();
-                } catch (e) {
-                    firebaseConfig = {
-                        apiKey: "AIzaSyD4g3gRYXMI1qtGg8XEZdJWmMkSLQiIaXU",
-                        authDomain: "rexplore-tech-web-1337.firebaseapp.com",
-                        projectId: "rexplore-tech-web-1337",
-                        storageBucket: "rexplore-tech-web-1337.firebasestorage.app",
-                        messagingSenderId: "564037030165",
-                        appId: "1:564037030165:web:4a4fbb921cc8b02a73d91c"
-                    };
-                }
+                // Force validated config for Localhost/Vercel symmetry
+                const firebaseConfig = {
+                    apiKey: "AIzaSyBFL1bBugLHZ7VI9bqncqnYD_HqDkPrrC8",
+                    authDomain: "rexploretech.firebaseapp.com",
+                    projectId: "rexploretech",
+                    storageBucket: "rexploretech.firebasestorage.app",
+                    messagingSenderId: "502051542015",
+                    appId: "1:502051542015:web:a88b9d23b7be2b5aa04dca"
+                };
+                console.log("Config initialized:", firebaseConfig.projectId);
 
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);

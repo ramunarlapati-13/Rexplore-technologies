@@ -446,12 +446,12 @@ try {
 } catch (err) {
     // Fallback for local development using npx serve or simple static server
     firebaseConfig = {
-        apiKey: "AIzaSyD4g3gRYXMI1qtGg8XEZdJWmMkSLQiIaXU",
-        authDomain: "rexplore-tech-web-1337.firebaseapp.com",
-        projectId: "rexplore-tech-web-1337",
-        storageBucket: "rexplore-tech-web-1337.firebasestorage.app",
-        messagingSenderId: "564037030165",
-        appId: "1:564037030165:web:4a4fbb921cc8b02a73d91c"
+        apiKey: "AIzaSyBFL1bBugLHZ7VI9bqncqnYD_HqDkPrrC8",
+        authDomain: "rexploretech.firebaseapp.com",
+        projectId: "rexploretech",
+        storageBucket: "rexploretech.firebasestorage.app",
+        messagingSenderId: "502051542015",
+        appId: "1:502051542015:web:a88b9d23b7be2b5aa04dca"
     };
     console.log("Using local fallback config");
 }
