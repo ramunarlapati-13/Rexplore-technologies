@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +14,7 @@
             display: flex;
             align-items: center;
         }
+
         .demo-container {
             max-width: 800px;
             margin: 0 auto;
@@ -24,29 +26,44 @@
             box-shadow: var(--shadow-glow);
             animation: fadeInScale 0.8s ease-out;
         }
+
         @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.95) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
+
         .demo-form {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: var(--spacing-lg);
         }
+
         .form-group {
             display: flex;
             flex-direction: column;
             gap: var(--spacing-xs);
         }
+
         .form-group.full-width {
             grid-column: span 2;
         }
+
         label {
             font-weight: 600;
             color: var(--primary-light);
             font-size: 0.9rem;
         }
-        input, select, textarea {
+
+        input,
+        select,
+        textarea {
             padding: 1rem;
             background: var(--bg-tertiary);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -55,28 +72,36 @@
             font-family: inherit;
             transition: var(--transition-base);
         }
-        input:focus, select:focus, textarea:focus {
+
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
         }
+
         .submit-container {
             grid-column: span 2;
             margin-top: var(--spacing-md);
         }
+
         @media (max-width: 768px) {
             .demo-form {
                 grid-template-columns: 1fr;
             }
+
             .form-group.full-width {
                 grid-column: span 1;
             }
+
             .submit-container {
                 grid-column: span 1;
             }
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar" id="navbar">
         <div class="container nav-container">
@@ -93,7 +118,8 @@
             <div class="demo-container">
                 <div class="section-header" style="text-align: left; margin-bottom: var(--spacing-xl);">
                     <h2 class="section-title">Book a Personal Demo</h2>
-                    <p class="section-description">Tell us about your project interests and requirements. Our experts will prepare a tailored demonstration for you.</p>
+                    <p class="section-description">Tell us about your project interests and requirements. Our experts
+                        will prepare a tailored demonstration for you.</p>
                 </div>
 
                 <form id="demoForm" class="demo-form">
@@ -123,7 +149,8 @@
                     </div>
                     <div class="form-group full-width">
                         <label for="requirements">Project Requirements & Interests *</label>
-                        <textarea id="requirements" name="requirements" rows="5" placeholder="Describe what you are looking for..." required></textarea>
+                        <textarea id="requirements" name="requirements" rows="5"
+                            placeholder="Describe what you are looking for..." required></textarea>
                     </div>
                     <div class="submit-container">
                         <button type="submit" class="btn btn-primary btn-full" id="submitBtn">Schedule My Demo</button>
@@ -136,6 +163,15 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Initialize EmailJS for Auto-Replies
+        // Replace 'YOUR_PUBLIC_KEY' with your actual Public Key from EmailJS
+        (function () {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+            script.onload = () => emailjs.init("_JcnOV_CIlWTBZFE8");
+            document.head.appendChild(script);
+        })();
 
         async function initDemo() {
             let firebaseConfig;
@@ -190,25 +226,36 @@
                     // 1. Save to Firebase (for Dashboard)
                     const docRef = await addDoc(collection(db, "demo_requests"), demoData);
 
-                    // 2. Send Background Email Alert (Zero-Setup FormSubmit)
+                    // 2. Send Background Email Alert to ADMIN (FormSubmit)
                     try {
                         fetch("https://formsubmit.co/ajax/ramunarlapati27@gmail.com", {
                             method: "POST",
                             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                             body: JSON.stringify({
                                 _subject: "🚀 New Demo Request from " + demoData.name,
-                                "Customer Name": demoData.name,
+                                "Client Name": demoData.name,
                                 "Email Address": demoData.email,
                                 "Service Interest": demoData.interest,
                                 "Referral Source": demoData.referral,
                                 "Message/Requirements": demoData.requirements,
                                 "Internal Tracking ID": docRef.id,
-                                _template: "table" // This makes the Gmail look like a professional form result
+                                _template: "table"
                             })
                         });
-                    } catch (emailErr) {
-                        console.log("Email background skip:", emailErr);
-                    }
+                    } catch (e) { console.log("Admin email skip"); }
+
+                    // 3. Send Auto-Reply to CLIENT (EmailJS)
+                    try {
+                        // These IDs will be filled by the user after creating an EmailJS account
+                        emailjs.send("rexploretech.mail", "template_8tqr218", {
+                            to_name: demoData.name,
+                            to_email: demoData.email,
+                            interest: demoData.interest,
+                            requirements: demoData.requirements,
+                            message: "Thanks for getting in touch! This is a quick note to let you know that we’ve received your form submission. ✅\nWe are currently reviewing your information and will follow up with you shortly. In the meantime, feel free to browse our latest updates or projects. 💻",
+                            company_name: "Rexplore technologies"
+                        });
+                    } catch (e) { console.log("Client auto-reply skip:", e); }
 
                     demoForm.reset();
                     showModal(docRef.id);
@@ -238,4 +285,5 @@
         </div>
     </div>
 </body>
+
 </html>
