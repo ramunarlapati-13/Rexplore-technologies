@@ -157,7 +157,7 @@
     <script type="module">
         import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, query, where, onSnapshot, or } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFL1bBugLHZ7VI9bqncqnYD_HqDkPrrC8",
@@ -202,61 +202,70 @@
             });
         }
 
-        function loadRequests(uid) {
+        async function loadRequests(uid) {
             const container = document.getElementById('requestsContainer');
             const userEmail = auth.currentUser.email;
+            const allRequests = new Map(); // Use Map to prevent duplicates
             
-            console.log("Loading requests for UID:", uid);
+            console.log("Syncing requests for:", userEmail);
             
-            // Primary query: By UID (new submissions)
-            const qUid = query(collection(db, "demo_requests"), where("uid", "==", uid));
-            
-            onSnapshot(qUid, (snapshot) => {
-                if (!snapshot.empty) {
-                    renderRequests(snapshot, container);
+            const renderUnified = () => {
+                if (allRequests.size === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px;">
+                            <p style="color: var(--text-muted); margin-bottom: 15px;">You haven't submitted any project briefs yet.</p>
+                            <a href="book-a-demo.html" class="btn btn-primary" style="font-size: 0.8rem; padding: 10px 20px;">Start Your First Project</a>
+                        </div>`;
                 } else {
-                    // Fallback query: By Email (legacy submissions)
-                    console.log("No UID requests found, checking by email...");
-                    const qEmail = query(collection(db, "demo_requests"), where("email", "==", userEmail));
-                    onSnapshot(qEmail, (emailSnapshot) => {
-                        if (emailSnapshot.empty) {
-                            container.innerHTML = `
-                                <div style="text-align: center; padding: 40px; border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px;">
-                                    <p style="color: var(--text-muted); margin-bottom: 15px;">You haven't submitted any project briefs yet.</p>
-                                    <a href="book-a-demo.html" class="btn btn-primary" style="font-size: 0.8rem; padding: 10px 20px;">Start Your First Project</a>
-                                </div>`;
-                        } else {
-                            renderRequests(emailSnapshot, container);
-                        }
-                    }, (error) => {
-                        console.error("Email Fallback Error:", error);
-                        container.innerHTML = '<p style="color: #ef4444;">Error loading legacy requests. Please check your connection.</p>';
-                    });
+                    renderRequests(Array.from(allRequests.values()), container);
                 }
-            }, (error) => {
+            };
+
+            const handleError = (error) => {
                 console.error("Firestore Error:", error);
                 if (error.code === 'permission-denied') {
-                    container.innerHTML = '<p style="color: #ef4444;">Permission denied. Please ensure your demo requests are linked to your account.</p>';
-                } else {
-                    container.innerHTML = '<p style="color: #ef4444;">Error: ' + error.message + '</p>';
+                    container.innerHTML = `
+                        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 20px; border-radius: 12px; text-align: center;">
+                            <p style="color: #ef4444; font-weight: 600;">🔒 Access Restricted (Permission Denied)</p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">
+                                Please ensure the latest <strong>firestore.rules</strong> are Published in your Firebase Console.
+                            </p>
+                            <button onclick="location.reload()" class="btn btn-secondary" style="margin-top: 15px; font-size: 0.7rem;">Try Again</button>
+                        </div>`;
                 }
-            });
+            };
+
+            // Query 1: By UID
+            const qUid = query(collection(db, "demo_requests"), where("uid", "==", uid));
+            onSnapshot(qUid, (snapshot) => {
+                snapshot.forEach(doc => allRequests.set(doc.id, {id: doc.id, ...doc.data()}));
+                renderUnified();
+            }, handleError);
+
+            // Query 2: By Email (Legacy fallback)
+            const qEmail = query(collection(db, "demo_requests"), where("email", "==", userEmail));
+            onSnapshot(qEmail, (snapshot) => {
+                snapshot.forEach(doc => allRequests.set(doc.id, {id: doc.id, ...doc.data()}));
+                renderUnified();
+            }, handleError);
         }
 
-        function renderRequests(snapshot, container) {
+        // Updated render function to accept array
+        function renderRequests(requestList, container) {
             container.innerHTML = '';
-            snapshot.forEach(docData => {
-                const data = docData.data();
-                const id = docData.id;
+            
+            // Sort by timestamp if available
+            requestList.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+            requestList.forEach(data => {
+                const id = data.id;
                 const status = (data.status || 'received').toLowerCase();
                 
                 const item = document.createElement('div');
                 item.className = 'request-item';
                 
-                // Roadmap Data
                 const steps = ['received', 'reviewed', 'in-progress', 'finalizing', 'live'];
                 const currentIdx = steps.indexOf(status);
-                // Calculate progress: 0=0%, 1=25%, 2=50%, 3=75%, 4=100%
                 const progress = currentIdx >= 0 ? (currentIdx / (steps.length - 1)) * 100 : 0;
 
                 let statusDisplay = '';
@@ -264,34 +273,29 @@
                     statusDisplay = `
                         <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0;">
                             <span style="color: #ef4444; font-weight: 700; font-size: 1.1rem;">❌ Request Declined</span>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">This request has been reviewed and declined. Please contact support for more details.</p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">This request has been reviewed and declined.</p>
                         </div>
                     `;
                 } else {
                     statusDisplay = `
                         <div class="status-roadmap">
                             <div class="roadmap-progress-bar" style="width: ${progress}%"></div>
-                            
                             <div class="roadmap-step ${currentIdx >= 0 ? (currentIdx > 0 ? 'completed' : 'active') : ''}">
                                 <div class="step-dot">${currentIdx > 0 ? '✓' : '1'}</div>
                                 <div class="step-label">Received</div>
                             </div>
-                            
                             <div class="roadmap-step ${currentIdx >= 1 ? (currentIdx > 1 ? 'completed' : 'active') : ''}">
                                 <div class="step-dot">${currentIdx > 1 ? '✓' : '2'}</div>
                                 <div class="step-label">Reviewed</div>
                             </div>
-                            
                             <div class="roadmap-step ${currentIdx >= 2 ? (currentIdx > 2 ? 'completed' : 'active') : ''}">
                                 <div class="step-dot">${currentIdx > 2 ? '✓' : '3'}</div>
                                 <div class="step-label">Working</div>
                             </div>
-                            
                             <div class="roadmap-step ${currentIdx >= 3 ? (currentIdx > 3 ? 'completed' : 'active') : ''}">
                                 <div class="step-dot">${currentIdx > 3 ? '✓' : '4'}</div>
                                 <div class="step-label">Finishing</div>
                             </div>
-                            
                             <div class="roadmap-step ${currentIdx >= 4 ? (currentIdx > 4 ? 'live completed' : 'active') : ''}">
                                 <div class="step-dot">🚀</div>
                                 <div class="step-label">Live</div>
@@ -302,24 +306,30 @@
 
                 item.innerHTML = `
                     <div class="request-header">
-                        <div>
-                            <div class="request-title">${data.interest}</div>
-                            <div class="request-id">ID: ${id.toUpperCase()}</div>
+                        <div style="flex: 1;">
+                            <div class="request-title" style="font-size: 1.1rem; font-weight: 700;">${data.interest}</div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                                <code onclick="copyTrackingId('${id}')" style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); padding: 4px 10px; border-radius: 6px; color: var(--primary-light); font-weight: 600; font-family: monospace; font-size: 0.85rem; cursor: pointer;" title="Click to copy">
+                                    ID: ${id}
+                                </code>
+                                <button onclick="copyTrackingId('${id}')" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 5px;">
+                                    <span>📋</span> Copy
+                                </button>
+                            </div>
                         </div>
                         <div style="text-align: right;">
                             <div style="font-size: 0.75rem; color: var(--text-muted);">Current Status</div>
-                            <div style="font-weight: 700; color: ${status === 'live' ? 'var(--success-color)' : (status === 'rejected' || status === 'declined' ? '#ef4444' : 'var(--primary-light)')}; text-transform: capitalize;">${status.replace('-', ' ')}</div>
+                            <div style="font-weight: 700; color: ${status === 'live' ? 'var(--success-color)' : (status === 'rejected' || status === 'declined' ? '#ef4444' : 'var(--primary-light)')}; text-transform: capitalize; font-size: 0.9rem;">
+                                ${status.replace('-', ' ')}
+                            </div>
                         </div>
                     </div>
-
                     ${statusDisplay}
-
                     <div class="request-footer" style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);">
                         <span>Timeline: ${data.timeline || 'TBD'}</span>
                         <span>Submitted: ${data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : 'Recent'}</span>
                     </div>
                 `;
-
                 container.appendChild(item);
             });
         }
@@ -328,9 +338,24 @@
 
         window.copyRef = () => {
             const input = document.getElementById('refLinkInput');
-            input.select();
-            document.execCommand('copy');
-            alert('Referral link copied to clipboard!');
+            copyText(input.value, 'Referral Link');
+        };
+
+        window.copyTrackingId = (id) => {
+            copyText(id, 'Tracking ID');
+        };
+
+        window.copyText = (text, type = 'Content') => {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.createElement('div');
+                toast.style = "position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #6366f1; color: white; padding: 10px 25px; border-radius: 30px; font-size: 0.85rem; z-index: 10000; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease;";
+                toast.innerHTML = `✓ ${type} Copied!`;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 2500);
+            });
         };
     </script>
 </body>

@@ -741,7 +741,13 @@
                     
                     message.innerHTML = `
                         Your demo request and brief have been submitted successfully.<br><br>
-                        <strong>Your Tracking ID:</strong> <code style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:4px; font-family:monospace;">${id}</code><br><br>
+                        
+                        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; text-align: center;">
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Your Tracking ID:</span>
+                            <code id="modalTrackingId" style="background:rgba(99, 102, 241, 0.1); padding: 5px 12px; border-radius:4px; font-family:monospace; font-weight: bold; color: var(--primary-light); font-size: 1.1rem; border: 1px solid rgba(99, 102, 241, 0.2); cursor: pointer;" onclick="copyText('${id}', 'Tracking ID')">${id}</code>
+                            <button onclick="copyText('${id}', 'Tracking ID')" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.7rem; margin-top: 10px; display: block; width: 100%;">📋 Copy Tracking ID</button>
+                        </div>
+
                         <div style="background: rgba(79, 70, 229, 0.1); padding: 15px; border-radius: 8px; border: 1px dashed var(--primary-color); margin-top: 10px;">
                             <p style="margin-bottom: 5px; font-size: 0.85rem; font-weight: bold; color: var(--primary-color);">🎁 Share & Refer</p>
                             <p style="font-size: 0.8rem; margin-bottom: 10px;">Refer others using your personal link:</p>
@@ -756,9 +762,20 @@
 
                 window.copyModalRef = () => {
                     const input = document.getElementById('modalRefInput');
-                    input.select();
-                    document.execCommand('copy');
-                    alert('Referral link copied to clipboard!');
+                    copyText(input.value, 'Referral Link');
+                };
+
+                window.copyText = (text, type = 'Content') => {
+                    navigator.clipboard.writeText(text).then(() => {
+                        const toast = document.createElement('div');
+                        toast.style = "position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #6366f1; color: white; padding: 10px 25px; border-radius: 30px; font-size: 0.85rem; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease;";
+                        toast.innerHTML = `✓ ${type} Copied!`;
+                        document.body.appendChild(toast);
+                        setTimeout(() => {
+                            toast.style.opacity = '0';
+                            setTimeout(() => toast.remove(), 300);
+                        }, 2500);
+                    });
                 };
 
                 // Collect Checkbox values

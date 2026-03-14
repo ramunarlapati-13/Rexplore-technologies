@@ -29,14 +29,15 @@
             <ul class="nav-menu" id="navMenu">
                 <li><a href="#home" class="nav-link active">Home</a></li>
                 <li><a href="#services" class="nav-link">Services</a></li>
-                <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
+                <li><a href="#portfolio" class="nav-link">Our Work</a></li>
                 <li><a href="#team" class="nav-link">Team</a></li>
-                <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
                 <li><a href="book-a-demo.html" class="nav-link">Book a Demo</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
                 <li id="authNavItem">
-                    <button id="loginBtn" class="btn btn-secondary" style="padding: 0.5rem 1.5rem; font-size: 0.9rem; margin-left: 1rem;">Log In</button>
-                    <a href="profile.html" id="profileLink" class="nav-link" style="display:none; font-weight: 700; color: var(--primary-light);">Profile</a>
+                    <button id="loginBtn" class="btn btn-secondary"
+                        style="padding: 0.5rem 1.5rem; font-size: 0.9rem; margin-left: 1rem;">Log In</button>
+                    <a href="profile.html" id="profileLink" class="nav-link"
+                        style="display:none; font-weight: 700; color: var(--primary-light);">Profile</a>
                 </li>
             </ul>
             <div class="hamburger" id="hamburger">
@@ -516,17 +517,18 @@
     <div id="trackModal" class="success-modal">
         <div class="modal-content" style="max-width: 500px;">
             <h3 style="margin-bottom: 1rem;">Track Your Request</h3>
-            <p style="margin-bottom: 1.5rem;">Enter your internal tracking ID to see the current status of your project brief or demo request.</p>
-            
+            <p style="margin-bottom: 1.5rem;">Enter your internal tracking ID to see the current status of your project
+                brief or demo request.</p>
+
             <div class="tracking-input-group">
-                <input type="text" id="trackingIdInput" placeholder="EX: 7XzR... (Tracking ID)" 
-                       style="flex: 1; padding: 0.8rem; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                <input type="text" id="trackingIdInput" placeholder="EX: 7XzR... (Tracking ID)"
+                    style="flex: 1; padding: 0.8rem; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid rgba(255,255,255,0.1); color: white;">
                 <button id="trackBtn" class="btn btn-primary" style="padding: 0.8rem 1.5rem;">Search</button>
             </div>
 
             <div id="trackingResult" class="tracking-result">
                 <div id="statusBadge" class="status-badge" style="display: none;">Status</div>
-                
+
                 <div class="status-roadmap" id="statusRoadmap">
                     <div class="roadmap-progress-bar" id="roadmapProgress"></div>
                     <div class="roadmap-step" data-step="received">
@@ -555,14 +557,19 @@
                     <p><strong>Request Name:</strong> <span id="trackName"></span></p>
                     <p><strong>Service:</strong> <span id="trackService"></span></p>
                     <p><strong>Timeline:</strong> <span id="trackTimeline"></span></p>
-                    <p id="liveStatusLink" style="display: none; color: var(--success-color); font-weight: bold; margin-bottom: 10px;">🎉 Your request is now live!</p>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Last Updated: <span id="trackTime"></span></p>
+                    <p id="liveStatusLink"
+                        style="display: none; color: var(--success-color); font-weight: bold; margin-bottom: 10px;">🎉
+                        Your request is now live!</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Last Updated: <span
+                            id="trackTime"></span></p>
                 </div>
             </div>
 
-            <div id="trackError" style="color: #ef4444; display: none; margin-top: 1rem; font-size: 0.8rem; line-height: 1.4;">
+            <div id="trackError"
+                style="color: #ef4444; display: none; margin-top: 1rem; font-size: 0.8rem; line-height: 1.4;">
                 Invalid ID. Please re-enter correctly.<br>
-                <span style="font-size: 0.7rem; opacity: 0.8;">Note: IDs are case-sensitive (capital/small letters matter).</span>
+                <span style="font-size: 0.7rem; opacity: 0.8;">Note: IDs are case-sensitive (capital/small letters
+                    matter).</span>
             </div>
 
             <button class="modal-btn" onclick="closeTrackModal()" style="margin-top: 2rem;">Close</button>
