@@ -45,7 +45,7 @@ export default async function handler(req, res) {
         if (text.startsWith('/track')) {
             const trackingId = text.split(' ')[1];
             if (!trackingId) {
-                await sendMessage(chat_id, "❌ Please provide a Tracking ID.\nExample: `/track 7XzR9` ");
+                await sendMessage(chat_id, "🔍 *Please enter your Tracking id* \n\nExample: `/track 7XzR9z` ");
                 return res.status(200).send('OK');
             }
 
