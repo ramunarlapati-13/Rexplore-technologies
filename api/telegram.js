@@ -1,5 +1,5 @@
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8704009081:AAERKhnUA6nPrX4LNxBlr8uUQyDxGuf6QMs';
-const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID; // You need to set this in Vercel/Environment
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID;
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID || 'rexploretech';
 
 export default async function handler(req, res) {
@@ -41,14 +41,21 @@ export default async function handler(req, res) {
             return res.status(200).send('OK');
         }
 
-        // Track command
-        if (text.startsWith('/track')) {
-            const trackingId = text.split(' ')[1];
-            if (!trackingId) {
-                await sendMessage(chat_id, "🔍 *Please enter your Tracking id* \n\nExample: `/track 7XzR9z` ");
-                return res.status(200).send('OK');
-            }
+        // Track command (Initial request)
+        if (text === '/track') {
+            await sendMessage(chat_id, "🔍 *Please enter your Tracking id*");
+            return res.status(200).send('OK');
+        }
 
+        // Handle Tracking ID (Either via '/track ID' or just 'ID')
+        let trackingId = null;
+        if (text.startsWith('/track ')) {
+            trackingId = text.split(' ')[1];
+        } else if (!text.startsWith('/')) {
+            trackingId = text.trim();
+        }
+
+        if (trackingId) {
             try {
                 // Fetch from Firestore via REST API
                 const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/demo_requests/${trackingId}`;
@@ -68,11 +75,11 @@ export default async function handler(req, res) {
                 message += `🚀 *Service:* ${data.interest}\n\n`;
                 message += `📊 *Current Stage:* ${status}\n`;
                 message += `📅 *Timeline:* ${data.timeline || 'TBD'}\n`;
-                message += `\n🔗 [View on Rexplore Website](https://rexploretech.vercel.app/profile.html)`;
+                message += `\n🔗 [View Full Profile](https://rexploretech.vercel.app/profile.html)`;
 
                 await sendMessage(chat_id, message);
             } catch (err) {
-                await sendMessage(chat_id, "⚠️ error fetching data from Rexplore servers.");
+                await sendMessage(chat_id, "⚠️ Error fetching data from Rexplore servers.");
             }
             return res.status(200).send('OK');
         }
