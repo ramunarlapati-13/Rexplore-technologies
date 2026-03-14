@@ -28,7 +28,7 @@ export default async function handler(req, res) {
                             `• \`/track <ID>\` — Check your project status\n` +
                             `• \`/getid\` — Get your Chat ID (For Admin Setup)\n` +
                             `• \`/help\` — Show this command list\n\n` +
-                            `🌐 *Official Website:* [rexploretech.vercel.app](https://rexploretech.vercel.app/)\n\n` +
+                            `🌐 *Official Website:* [rexplore-tech.vercel.app](https://rexplore-tech.vercel.app/)\n\n` +
                             `🚀 *Example:* \`/track 7XzR9z\``;
             
             await sendMessage(chat_id, welcome);
@@ -75,7 +75,7 @@ export default async function handler(req, res) {
                 message += `🚀 *Service:* ${data.interest}\n\n`;
                 message += `📊 *Current Stage:* ${status}\n`;
                 message += `📅 *Timeline:* ${data.timeline || 'TBD'}\n`;
-                message += `\n🔗 [View Full Profile](https://rexploretech.vercel.app/profile.html)`;
+                message += `\n🔗 [View Full Profile](https://rexplore-tech.vercel.app/profile)`;
 
                 await sendMessage(chat_id, message);
             } catch (err) {
