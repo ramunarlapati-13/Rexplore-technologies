@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book a Demo - Rexplore Technologies</title>
+    <title>Book a Demo & Project Brief - Rexplore Technologies</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         .demo-section {
@@ -16,7 +16,7 @@
         }
 
         .demo-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: rgba(19, 23, 41, 0.7);
             backdrop-filter: blur(20px);
@@ -39,6 +39,21 @@
             }
         }
 
+        .section-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .section-box h3 {
+            color: var(--primary-light);
+            margin-bottom: var(--spacing-md);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: var(--spacing-xs);
+        }
+
         .demo-form {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -57,11 +72,13 @@
 
         label {
             font-weight: 600;
-            color: var(--primary-light);
-            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
         }
 
-        input,
+        input[type="text"],
+        input[type="email"],
+        input[type="url"],
         select,
         textarea {
             padding: 1rem;
@@ -71,9 +88,12 @@
             color: var(--text-primary);
             font-family: inherit;
             transition: var(--transition-base);
+            width: 100%;
         }
 
-        input:focus,
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="url"]:focus,
         select:focus,
         textarea:focus {
             outline: none;
@@ -81,9 +101,153 @@
             box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
         }
 
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .custom-radio, .custom-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            padding: 0.8rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .custom-radio:hover, .custom-checkbox:hover {
+            border-color: var(--primary-light);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .custom-radio input[type="radio"],
+        .custom-checkbox input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-secondary);
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            outline: none;
+            transition: all 0.2s ease;
+            margin: 0;
+            padding: 0;
+        }
+
+        .custom-checkbox input[type="checkbox"] {
+            border-radius: 4px;
+        }
+
+        .custom-radio input[type="radio"]:checked {
+            border-color: var(--primary-color);
+        }
+
+        .custom-radio input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: var(--primary-color);
+            border-radius: 50%;
+        }
+
+        .custom-checkbox input[type="checkbox"]:checked {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .custom-checkbox input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .branch-section {
+            display: none;
+            animation: fadeInScale 0.5s ease-out;
+        }
+
+        .branch-section.active {
+            display: block;
+        }
+
         .submit-container {
-            grid-column: span 2;
             margin-top: var(--spacing-md);
+            text-align: center;
+        }
+
+        /* Success Modal Styles from original book-a-demo */
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .success-modal.active {
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            padding: 3rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .success-modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            color: var(--success-color);
+            margin-bottom: 1rem;
+        }
+
+        .modal-btn {
+            background: var(--gradient-primary);
+            color: var(--text-primary);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: all var(--transition-base);
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
         }
 
         @media (max-width: 768px) {
@@ -92,10 +256,6 @@
             }
 
             .form-group.full-width {
-                grid-column: span 1;
-            }
-
-            .submit-container {
                 grid-column: span 1;
             }
         }
@@ -117,61 +277,231 @@
         <div class="container">
             <div class="demo-container">
                 <div class="section-header" style="text-align: left; margin-bottom: var(--spacing-xl);">
-                    <h2 class="section-title">Book a Personal Demo</h2>
-                    <p class="section-description">Tell us about your project interests and requirements. Our experts
+                    <h2 class="section-title">Book a Demo & Project Brief</h2>
+                    <p class="section-description">Tell us about your project interests, requirements, and goals. Our experts
                         will prepare a tailored demonstration for you.</p>
                 </div>
 
-                <form id="demoForm" class="demo-form">
-                    <div class="form-group">
-                        <label for="fullName">Full Name *</label>
-                        <input type="text" id="fullName" name="name" placeholder="John Doe" required>
+                <form id="demoForm">
+                    <!-- Section 1: Contact Information -->
+                    <div class="section-box">
+                        <h3>Section 1: Contact Information</h3>
+                        <div class="demo-form">
+                            <div class="form-group full-width">
+                                <label for="fullName">Full Name / Company Name *</label>
+                                <input type="text" id="fullName" name="name" placeholder="John Doe / Tech Corp" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" placeholder="john@company.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="timeline">Project Timeline *</label>
+                                <select id="timeline" name="timeline" required>
+                                    <option value="" disabled selected>Select Timeline...</option>
+                                    <option value="ASAP (Under 2 weeks)">ASAP (Under 2 weeks)</option>
+                                    <option value="1-3 months">1-3 months</option>
+                                    <option value="3-6 months">3-6 months</option>
+                                    <option value="Flexible">Flexible</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="referral">Referral Code (Optional)</label>
+                                <input type="text" id="referral" name="referral" placeholder="REF-123">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="email">Email Address *</label>
-                        <input type="email" id="email" name="email" placeholder="john@company.com" required>
+
+                    <!-- Section 2: Primary Project Domain -->
+                    <div class="section-box">
+                        <h3>Section 2: Primary Project Domain</h3>
+                        <div class="form-group">
+                            <label>Select the main area of interest: *</label>
+                            <div class="radio-group" id="domainRadios">
+                                <label class="custom-radio">
+                                    <input type="radio" name="domain" value="Website Development" required>
+                                    Website Development
+                                </label>
+                                <label class="custom-radio">
+                                    <input type="radio" name="domain" value="Mobile App Development">
+                                    Mobile App Development
+                                </label>
+                                <label class="custom-radio">
+                                    <input type="radio" name="domain" value="UI/UX Design Only">
+                                    UI/UX Design Only
+                                </label>
+                                <label class="custom-radio">
+                                    <input type="radio" name="domain" value="Maintenance & Updates">
+                                    Maintenance & Updates
+                                </label>
+                                <label class="custom-radio">
+                                    <input type="radio" name="domain" value="Other">
+                                    Other Services (Cloud, Cyber, AI)
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="interest">Interested In *</label>
-                        <select id="interest" name="interest" required>
-                            <option value="" disabled selected>Select a service</option>
-                            <option value="Web Development">Web Development</option>
-                            <option value="Mobile Apps">Mobile Apps</option>
-                            <option value="AI Solutions">AI Solutions</option>
-                            <option value="Cloud Infrastructure">Cloud Infrastructure</option>
-                            <option value="Cybersecurity">Cybersecurity</option>
-                            <option value="Other">Other Services</option>
-                        </select>
+
+                    <!-- Section 3: Sub-Domain Specifics -->
+                    <div id="websiteBranch" class="section-box branch-section">
+                        <h3>Section 3: Website Specifics</h3>
+                        <div class="demo-form">
+                            <div class="form-group">
+                                <label for="websiteType">Type of Website:</label>
+                                <select id="websiteType" name="websiteType">
+                                    <option value="" disabled selected>Select Type...</option>
+                                    <option value="Portfolio">Portfolio (Personal/Professional showcase)</option>
+                                    <option value="E-commerce">E-commerce (Selling products/Online store)</option>
+                                    <option value="Corporate/Business">Corporate/Business (Service descriptions)</option>
+                                    <option value="Landing Page">Landing Page (Single page for campaign)</option>
+                                    <option value="Blog/News">Blog/News</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Key Features Needed:</label>
+                                <div class="checkbox-group" style="display: grid; grid-template-columns: 1fr 1fr;">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" name="webFeatures" value="User Auth"> User Auth
+                                    </label>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" name="webFeatures" value="Payment Gateway"> Payment Gateway
+                                    </label>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" name="webFeatures" value="Blog"> Blog
+                                    </label>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" name="webFeatures" value="Contact Form"> Contact Form
+                                    </label>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" name="webFeatures" value="Dashboard"> Dashboard
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="referral">Referral Code (Optional)</label>
-                        <input type="text" id="referral" name="referral" placeholder="REF-123">
+
+                    <div id="mobileBranch" class="section-box branch-section">
+                        <h3>Section 3: Mobile App Specifics</h3>
+                        <div class="demo-form">
+                            <div class="form-group">
+                                <label for="mobilePlatform">Platform:</label>
+                                <select id="mobilePlatform" name="mobilePlatform">
+                                    <option value="" disabled selected>Select Platform...</option>
+                                    <option value="iOS">iOS</option>
+                                    <option value="Android">Android</option>
+                                    <option value="Cross-Platform/Hybrid">Cross-Platform/Hybrid</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="mobileType">Type of App:</label>
+                                <select id="mobileType" name="mobileType">
+                                    <option value="" disabled selected>Select Type...</option>
+                                    <option value="Social Networking">Social Networking</option>
+                                    <option value="Utility/Tool">Utility/Tool</option>
+                                    <option value="Health/Fitness">Health/Fitness</option>
+                                    <option value="Education/LMS">Education/LMS</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Features Needed:</label>
+                                <div class="checkbox-group" style="display: grid; grid-template-columns: 1fr 1fr;">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" name="mobileFeatures" value="Push Notifications"> Push Notifications
+                                    </label>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" name="mobileFeatures" value="GPS/Maps"> GPS/Maps
+                                    </label>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" name="mobileFeatures" value="Camera Access"> Camera Access
+                                    </label>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" name="mobileFeatures" value="Offline Mode"> Offline Mode
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group full-width">
-                        <label for="requirements">Project Requirements & Interests *</label>
-                        <textarea id="requirements" name="requirements" rows="5"
-                            placeholder="Describe what you are looking for..." required></textarea>
+
+                    <!-- Section 4: Visual & Technical Preferences -->
+                    <div class="section-box">
+                        <h3>Section 4: Visual & Technical Preferences</h3>
+                        <div class="demo-form">
+                            <div class="form-group">
+                                <label for="designStyle">Design Style *</label>
+                                <select id="designStyle" name="designStyle" required>
+                                    <option value="" disabled selected>Select Style...</option>
+                                    <option value="Minimalist">Minimalist</option>
+                                    <option value="Modern/Bold">Modern/Bold</option>
+                                    <option value="Professional/Corporate">Professional/Corporate</option>
+                                    <option value="Playful/Creative">Playful/Creative</option>
+                                    <option value="Dark Mode/Tech">Dark Mode/Tech</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="referenceLinks">Reference Links</label>
+                                <input type="text" id="referenceLinks" name="referenceLinks" placeholder="Links to websites/apps you admire...">
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Section 5: Project Brief -->
+                    <div class="section-box">
+                        <h3>Section 5: Project Brief</h3>
+                        <div class="form-group full-width">
+                            <label for="requirements">Additional Details / Requirements *</label>
+                            <textarea id="requirements" name="requirements" rows="6"
+                                placeholder="Tell us a bit more about the problem you are trying to solve or the goal of this project..." required></textarea>
+                        </div>
+                    </div>
+
                     <div class="submit-container">
-                        <button type="submit" class="btn btn-primary btn-full" id="submitBtn">Schedule My Demo</button>
+                        <button type="submit" class="btn btn-primary btn-full" id="submitBtn" style="font-size: 1.1rem; padding: 1.2rem;">Schedule My Demo & Submit Brief</button>
                     </div>
                 </form>
             </div>
         </div>
     </section>
 
+    <!-- Success Modal -->
+    <div id="successModal" class="success-modal">
+        <div class="modal-content">
+            <div class="modal-icon">✓</div>
+            <h3 id="modalTitle">Request Received!</h3>
+            <p id="modalMessage">Your demo request and project brief have been submitted successfully.</p>
+            <button class="modal-btn" onclick="location.href='index.html'">Back to Home</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Initialize EmailJS for Auto-Replies
-        // Replace 'YOUR_PUBLIC_KEY' with your actual Public Key from EmailJS
+        // Initialize EmailJS
         (function () {
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
             script.onload = () => emailjs.init("_JcnOV_CIlWTBZFE8");
             document.head.appendChild(script);
         })();
+
+        // Handle Branching Logic
+        const domainRadios = document.querySelectorAll('input[name="domain"]');
+        const websiteBranch = document.getElementById('websiteBranch');
+        const mobileBranch = document.getElementById('mobileBranch');
+
+        domainRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                websiteBranch.classList.remove('active');
+                mobileBranch.classList.remove('active');
+                
+                if (e.target.value === 'Website Development') {
+                    websiteBranch.classList.add('active');
+                } else if (e.target.value === 'Mobile App Development') {
+                    mobileBranch.classList.add('active');
+                }
+            });
+        });
 
         async function initDemo() {
             let firebaseConfig;
@@ -180,7 +510,7 @@
                 if (!configRes.ok) throw new Error("API not available");
                 firebaseConfig = await configRes.json();
             } catch (err) {
-                // Fallback for local development using npx serve
+                // Fallback for local development
                 firebaseConfig = {
                     apiKey: "AIzaSyBFL1bBugLHZ7VI9bqncqnYD_HqDkPrrC8",
                     authDomain: "rexploretech.firebaseapp.com",
@@ -189,7 +519,6 @@
                     messagingSenderId: "502051542015",
                     appId: "1:502051542015:web:a88b9d23b7be2b5aa04dca"
                 };
-                console.log("Using local fallback config");
             }
 
             const app = initializeApp(firebaseConfig);
@@ -201,59 +530,79 @@
             demoForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 submitBtn.disabled = true;
-                submitBtn.textContent = 'Sending...';
+                submitBtn.textContent = 'Submitting...';
 
                 // Modal Control
                 window.showModal = (id) => {
                     const modal = document.getElementById('successModal');
                     const message = document.getElementById('modalMessage');
-                    message.innerHTML = `Your demo request has been submitted successfully.<br><br><strong>Your Tracking ID:</strong> <code style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:4px; font-family:monospace;">${id}</code><br><br>We will contact you shortly.`;
+                    message.innerHTML = `Your demo request and brief have been submitted successfully.<br><br><strong>Your Tracking ID:</strong> <code style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:4px; font-family:monospace;">${id}</code><br><br>We will contact you shortly.`;
                     modal.style.display = 'flex';
                     setTimeout(() => modal.classList.add('active'), 10);
                 };
+
+                // Collect Checkbox values
+                const webFeatures = Array.from(document.querySelectorAll('input[name="webFeatures"]:checked')).map(cb => cb.value);
+                const mobileFeatures = Array.from(document.querySelectorAll('input[name="mobileFeatures"]:checked')).map(cb => cb.value);
+                const domain = document.querySelector('input[name="domain"]:checked').value;
 
                 try {
                     const demoData = {
                         name: document.getElementById('fullName').value,
                         email: document.getElementById('email').value,
-                        interest: document.getElementById('interest').value,
+                        timeline: document.getElementById('timeline').value,
                         referral: document.getElementById('referral').value || 'none',
+                        interest: domain,
+                        designStyle: document.getElementById('designStyle').value,
+
+                        referenceLinks: document.getElementById('referenceLinks').value,
                         requirements: document.getElementById('requirements').value,
                         status: 'pending',
                         timestamp: serverTimestamp()
                     };
 
-                    // 1. Save to Firebase (for Dashboard)
+                    if (domain === 'Website Development') {
+                        demoData.websiteType = document.getElementById('websiteType').value;
+                        demoData.webFeatures = webFeatures;
+                    } else if (domain === 'Mobile App Development') {
+                        demoData.mobilePlatform = document.getElementById('mobilePlatform').value;
+                        demoData.mobileType = document.getElementById('mobileType').value;
+                        demoData.mobileFeatures = mobileFeatures;
+                    }
+
+                    // 1. Save to Firebase demo_requests
                     const docRef = await addDoc(collection(db, "demo_requests"), demoData);
 
                     // 2. Send Background Email Alert to ADMIN (FormSubmit)
                     try {
+                        let emailBody = {
+                            _subject: "🚀 New Demo / Brief from " + demoData.name,
+                            "Client Name": demoData.name,
+                            "Email Address": demoData.email,
+                            "Service Interest": demoData.interest,
+                            "Referral Source": demoData.referral,
+                            "Timeline": demoData.timeline,
+
+                            "Message/Requirements": demoData.requirements,
+                            "Internal Tracking ID": docRef.id,
+                            _template: "table"
+                        };
                         fetch("https://formsubmit.co/ajax/ramunarlapati27@gmail.com", {
                             method: "POST",
                             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                            body: JSON.stringify({
-                                _subject: "🚀 New Demo Request from " + demoData.name,
-                                "Client Name": demoData.name,
-                                "Email Address": demoData.email,
-                                "Service Interest": demoData.interest,
-                                "Referral Source": demoData.referral,
-                                "Message/Requirements": demoData.requirements,
-                                "Internal Tracking ID": docRef.id,
-                                _template: "table"
-                            })
+                            body: JSON.stringify(emailBody)
                         });
                     } catch (e) { console.log("Admin email skip"); }
 
                     // 3. Send Auto-Reply to CLIENT (EmailJS)
                     try {
-                        // These IDs will be filled by the user after creating an EmailJS account
                         emailjs.send("rexploretech.mail", "template_8tqr218", {
                             to_name: demoData.name,
                             to_email: demoData.email,
                             interest: demoData.interest,
                             requirements: demoData.requirements,
-                            message: "Thanks for getting in touch! This is a quick note to let you know that we’ve received your form submission. ✅\nWe are currently reviewing your information and will follow up with you shortly. In the meantime, feel free to browse our latest updates or projects. 💻",
-                            company_name: "Rexplore technologies"
+                            message: "Thanks for getting in touch! This is a quick note to let you know that we’ve received your comprehensive project brief and demo request. ✅\nWe are currently reviewing your specific requirements and timeline, and will follow up with you shortly. In the meantime, feel free to browse our latest updates or projects. 💻",
+                            company_name: "Rexplore Technologies"
                         });
                     } catch (e) { console.log("Client auto-reply skip:", e); }
 
@@ -268,22 +617,13 @@
                     }
                 } finally {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Schedule My Demo';
+                    submitBtn.textContent = 'Schedule My Demo & Submit Brief';
                 }
             });
         }
 
         initDemo();
     </script>
-    <!-- Success Modal -->
-    <div id="successModal" class="success-modal">
-        <div class="modal-content">
-            <div class="modal-icon">✓</div>
-            <h3 id="modalTitle">Request Received!</h3>
-            <p id="modalMessage">Your demo request has been submitted successfully.</p>
-            <button class="modal-btn" onclick="location.href='index.html'">Back to Home</button>
-        </div>
-    </div>
 </body>
 
 </html>
