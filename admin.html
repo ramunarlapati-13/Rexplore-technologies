@@ -106,6 +106,7 @@
             <div class="tabs">
                 <button class="tab-btn active" data-target="testimonialsList">Testimonials</button>
                 <button class="tab-btn" data-target="demoList">Demo Requests</button>
+                <button class="tab-btn" data-target="referralStats">Referral Stats</button>
             </div>
 
             <div id="testimonialsList" class="data-list active">
@@ -114,6 +115,15 @@
 
             <div id="demoList" class="data-list">
                 <p>Loading demo requests...</p>
+            </div>
+
+            <div id="referralStats" class="data-list">
+                <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <h3 style="color: var(--primary-light); margin-bottom: 1.5rem;">Referral Leaderboard</h3>
+                    <div id="referralContainer">
+                        <p>Loading stats...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -180,6 +190,7 @@
             setupTabs();
             loadData("testimonials", "testimonialsList");
             loadData("demo_requests", "demoList");
+            loadReferralStats();
         }
 
         function showLogin() {
@@ -300,6 +311,55 @@
                 console.error('Failed to copy: ', err);
             });
         };
+
+        function loadReferralStats() {
+            const container = document.getElementById('referralContainer');
+            const q = collection(db, "demo_requests");
+            
+            onSnapshot(q, (snapshot) => {
+                const stats = {};
+                snapshot.forEach(docData => {
+                    const data = docData.data();
+                    const ref = data.referral;
+                    if (ref && ref !== 'none' && ref !== '') {
+                        stats[ref] = (stats[ref] || 0) + 1;
+                    }
+                });
+
+                container.innerHTML = '';
+                const sortedRefs = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+
+                if (sortedRefs.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-muted);">No referrals tracked yet.</p>';
+                    return;
+                }
+
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+                table.innerHTML = `
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                            <th style="padding: 10px; color: var(--text-secondary);">User (Email)</th>
+                            <th style="padding: 10px; color: var(--text-secondary); text-align: right;">Total Referrals</th>
+                        </tr>
+                    </thead>
+                    <tbody id="refTableBody"></tbody>
+                `;
+                
+                const tbody = table.querySelector('#refTableBody');
+                sortedRefs.forEach(([email, count]) => {
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                    row.innerHTML = `
+                        <td style="padding: 12px; font-weight: 500;">${email}</td>
+                        <td style="padding: 12px; text-align: right; font-weight: 800; color: var(--primary-color);">${count} members</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                container.appendChild(table);
+            });
+        }
 
         init();
     </script>

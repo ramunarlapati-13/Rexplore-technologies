@@ -383,6 +383,9 @@
                         <div class="user-info">
                             <span id="userName" class="user-name"></span>
                             <span id="userEmail" class="user-email"></span>
+                            <div id="userRefContainer" style="margin-top: 5px; font-size: 0.75rem; color: var(--primary-color);">
+                                🔗 Ref Link: <span id="userRefLink" style="cursor: pointer; text-decoration: underline;" title="Click to copy">Loading...</span>
+                            </div>
                         </div>
                         <button id="signOutBtn" style="background:none; border:none; color: #ef4444; cursor:pointer; font-size: 0.8rem; margin-left: 1rem; text-decoration: underline;">Switch Account</button>
                     </div>
@@ -610,6 +613,19 @@
             document.head.appendChild(script);
         })();
 
+        // Handle URL Referral Link (e.g., book-a-demo.html?ref=john@gmail.com)
+        const urlParams = new URLSearchParams(window.location.search);
+        const refParam = urlParams.get('ref');
+        if (refParam) {
+            const referralInput = document.getElementById('referral');
+            if (referralInput) {
+                referralInput.value = refParam;
+                referralInput.readOnly = true; // Lock it if from link
+                referralInput.style.background = "rgba(79, 70, 229, 0.1)"; 
+                referralInput.title = "Referral applied from link";
+            }
+        }
+
         // Handle Branching Logic
         const domainRadios = document.querySelectorAll('input[name="domain"]');
         const websiteBranch = document.getElementById('websiteBranch');
@@ -672,13 +688,22 @@
                     userName.textContent = user.displayName;
                     userEmail.textContent = user.email;
 
+                    // Update Referral Link display
+                    const refLink = `${window.location.protocol}//${window.location.host}${window.location.pathname}?ref=${user.email}`;
+                    const refDisplay = document.getElementById('userRefLink');
+                    refDisplay.textContent = refLink.substring(0, 30) + "...";
+                    refDisplay.onclick = () => {
+                        navigator.clipboard.writeText(refLink);
+                        alert('Your referral link has been copied!');
+                    };
+
                     // Auto-fill form fields
                     fullNameInput.value = user.displayName || "";
                     emailInput.value = user.email || "";
-                    // Make them read-only/verified
-                    fullNameInput.readOnly = true;
+                    // Allow editing name but keep email verified/read-only
+                    fullNameInput.readOnly = false;
                     emailInput.readOnly = true;
-                    fullNameInput.style.opacity = "0.7";
+                    fullNameInput.style.opacity = "1";
                     emailInput.style.opacity = "0.7";
                 } else {
                     loginSection.style.display = 'block';
@@ -710,9 +735,29 @@
                 window.showModal = (id) => {
                     const modal = document.getElementById('successModal');
                     const message = document.getElementById('modalMessage');
-                    message.innerHTML = `Your demo request and brief have been submitted successfully.<br><br><strong>Your Tracking ID:</strong> <code style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:4px; font-family:monospace;">${id}</code><br><br>We will contact you shortly.`;
+                    const user = auth.currentUser;
+                    const refLink = `${window.location.protocol}//${window.location.host}${window.location.pathname}?ref=${user.email}`;
+                    
+                    message.innerHTML = `
+                        Your demo request and brief have been submitted successfully.<br><br>
+                        <strong>Your Tracking ID:</strong> <code style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:4px; font-family:monospace;">${id}</code><br><br>
+                        <div style="background: rgba(79, 70, 229, 0.1); padding: 15px; border-radius: 8px; border: 1px dashed var(--primary-color); margin-top: 10px;">
+                            <p style="margin-bottom: 5px; font-size: 0.85rem; font-weight: bold; color: var(--primary-color);">🎁 Share & Refer</p>
+                            <p style="font-size: 0.8rem; margin-bottom: 10px;">Refer others using your personal link:</p>
+                            <input type="text" readonly value="${refLink}" id="modalRefInput" 
+                                style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); background: var(--bg-tertiary); color: white; font-size: 0.75rem; margin-bottom: 8px;">
+                            <button onclick="copyModalRef()" class="btn btn-primary" style="padding: 5px 15px; font-size: 0.8rem; width: 100%;">Copy Referral Link</button>
+                        </div>
+                    `;
                     modal.style.display = 'flex';
                     setTimeout(() => modal.classList.add('active'), 10);
+                };
+
+                window.copyModalRef = () => {
+                    const input = document.getElementById('modalRefInput');
+                    input.select();
+                    document.execCommand('copy');
+                    alert('Referral link copied to clipboard!');
                 };
 
                 // Collect Checkbox values
