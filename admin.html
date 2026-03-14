@@ -251,7 +251,8 @@
                                 <p><strong>ID:</strong> <code style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:3px;">${id}</code> 
                                     <button onclick="copyToClipboard('${id}')" style="background:none; border:none; color:var(--primary-color); cursor:pointer; font-size:0.8rem; margin-left:5px;">📋 Copy</button>
                                 </p>
-                                <p><strong>Email:</strong> ${data.email}</p>
+                                 <p><strong>Email:</strong> ${data.email}</p>
+                                <p><strong>UID:</strong> <span style="font-size: 0.75rem; color: ${data.uid ? 'var(--success-color)' : 'var(--text-muted)'}">${data.uid || 'Anonymous/Legacy'}</span></p>
                                 <p><strong>Requirements:</strong> ${data.requirements}</p>
                                 <p><strong>Referral:</strong> ${data.referral}</p>
                                 <div style="margin: 10px 0;">

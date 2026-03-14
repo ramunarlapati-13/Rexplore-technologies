@@ -34,6 +34,10 @@
                 <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
                 <li><a href="book-a-demo.html" class="nav-link">Book a Demo</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li id="authNavItem">
+                    <button id="loginBtn" class="btn btn-secondary" style="padding: 0.5rem 1.5rem; font-size: 0.9rem; margin-left: 1rem;">Log In</button>
+                    <a href="profile.html" id="profileLink" class="nav-link" style="display:none; font-weight: 700; color: var(--primary-light);">Profile</a>
+                </li>
             </ul>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -566,6 +570,45 @@
     </div>
 
     <script type="module" src="script.js"></script>
+    <script type="module">
+        import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFL1bBugLHZ7VI9bqncqnYD_HqDkPrrC8",
+            authDomain: "rexploretech.firebaseapp.com",
+            projectId: "rexploretech",
+            storageBucket: "rexploretech.firebasestorage.app",
+            messagingSenderId: "502051542015",
+            appId: "1:502051542015:web:a88b9d23b7be2b5aa04dca"
+        };
+
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        const loginBtn = document.getElementById('loginBtn');
+        const profileLink = document.getElementById('profileLink');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginBtn.style.display = 'none';
+                profileLink.style.display = 'block';
+                profileLink.textContent = user.displayName.split(' ')[0] + "'s Profile";
+            } else {
+                loginBtn.style.display = 'block';
+                profileLink.style.display = 'none';
+            }
+        });
+
+        loginBtn.onclick = async () => {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (err) {
+                console.error("Login failed", err);
+            }
+        };
+    </script>
 </body>
 
 </html>
