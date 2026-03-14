@@ -833,6 +833,23 @@
                         });
                     } catch (e) { console.log("Admin email skip"); }
 
+                    // 2.5 Telegram Admin Alert
+                    try {
+                        fetch("/api/telegram", {
+                            method: "POST",
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                type: 'admin_alert',
+                                data: {
+                                    name: demoData.name,
+                                    interest: demoData.interest,
+                                    id: trackingId,
+                                    referral: demoData.referral
+                                }
+                            })
+                        });
+                    } catch (e) { console.log("Telegram alert skip"); }
+
                     // 3. Send Auto-Reply to CLIENT (EmailJS)
                     try {
                         const companyName = "Rexplore Technologies";
