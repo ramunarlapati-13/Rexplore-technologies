@@ -186,6 +186,93 @@
             display: block;
         }
 
+        /* Auth Section Styles */
+        .auth-container {
+            margin-bottom: var(--spacing-xl);
+            text-align: center;
+            padding: var(--spacing-lg);
+            background: rgba(99, 102, 241, 0.05);
+            border-radius: var(--radius-lg);
+            border: 1px dashed rgba(99, 102, 241, 0.3);
+        }
+
+        .user-profile {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 0.5rem;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+        }
+
+        .user-info {
+            text-align: left;
+        }
+
+        .user-name {
+            font-weight: 600;
+            display: block;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .btn-google {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            color: #333;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-google:hover {
+            background: #f1f1f1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .form-overlay {
+            position: relative;
+        }
+
+        .form-locked {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(19, 23, 41, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-xl);
+        }
+
+        .lock-message {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 300px;
+        }
+
         .submit-container {
             margin-top: var(--spacing-md);
             text-align: center;
@@ -282,7 +369,34 @@
                         will prepare a tailored demonstration for you.</p>
                 </div>
 
-                <form id="demoForm">
+                <!-- Google Sign-In Section -->
+                <div class="auth-container">
+                    <div id="loginSection">
+                        <p style="margin-bottom: 1rem; color: var(--text-secondary);">Please sign in to verify your identity before submitting.</p>
+                        <button id="googleSignInBtn" class="btn-google">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
+                            Sign in with Google
+                        </button>
+                    </div>
+                    <div id="userSection" class="user-profile">
+                        <img id="userImg" src="" alt="Profile">
+                        <div class="user-info">
+                            <span id="userName" class="user-name"></span>
+                            <span id="userEmail" class="user-email"></span>
+                        </div>
+                        <button id="signOutBtn" style="background:none; border:none; color: #ef4444; cursor:pointer; font-size: 0.8rem; margin-left: 1rem; text-decoration: underline;">Switch Account</button>
+                    </div>
+                </div>
+
+                <div class="form-overlay">
+                    <div id="formLock" class="form-locked">
+                        <div class="lock-message">
+                            <i style="font-size: 2rem; color: var(--primary-color); display: block; margin-bottom: 1rem;">🔒</i>
+                            <p>Authentication Required</p>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">Please sign in with Google above to unlock the form.</p>
+                        </div>
+                    </div>
+                    <form id="demoForm">
                     <!-- Section 1: Contact Information -->
                     <div class="section-box">
                         <h3>Section 1: Contact Information</h3>
@@ -459,6 +573,7 @@
                         <button type="submit" class="btn btn-primary btn-full" id="submitBtn" style="font-size: 1.1rem; padding: 1.2rem;">Schedule My Demo & Submit Brief</button>
                     </div>
                 </form>
+                </div>
             </div>
         </div>
     </section>
@@ -475,6 +590,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // Initialize EmailJS
@@ -522,7 +638,56 @@
             }
 
             const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
             const db = getFirestore(app);
+            const provider = new GoogleAuthProvider();
+
+            // Auth Elements
+            const loginSection = document.getElementById('loginSection');
+            const userSection = document.getElementById('userSection');
+            const formLock = document.getElementById('formLock');
+            const userImg = document.getElementById('userImg');
+            const userName = document.getElementById('userName');
+            const userEmail = document.getElementById('userEmail');
+            const fullNameInput = document.getElementById('fullName');
+            const emailInput = document.getElementById('email');
+
+            // Handle Auth State
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    loginSection.style.display = 'none';
+                    userSection.style.display = 'flex';
+                    formLock.style.display = 'none';
+                    
+                    userImg.src = user.photoURL || 'https://via.placeholder.com/40';
+                    userName.textContent = user.displayName;
+                    userEmail.textContent = user.email;
+
+                    // Auto-fill form fields
+                    fullNameInput.value = user.displayName || "";
+                    emailInput.value = user.email || "";
+                    // Make them read-only/verified
+                    fullNameInput.readOnly = true;
+                    emailInput.readOnly = true;
+                    fullNameInput.style.opacity = "0.7";
+                    emailInput.style.opacity = "0.7";
+                } else {
+                    loginSection.style.display = 'block';
+                    userSection.style.display = 'none';
+                    formLock.style.display = 'flex';
+                    fullNameInput.value = "";
+                    emailInput.value = "";
+                    fullNameInput.readOnly = false;
+                    emailInput.readOnly = false;
+                    fullNameInput.style.opacity = "1";
+                    emailInput.style.opacity = "1";
+                }
+            });
+
+            // Sign In
+            document.getElementById('googleSignInBtn').onclick = () => signInWithPopup(auth, provider);
+            // Sign Out
+            document.getElementById('signOutBtn').onclick = () => signOut(auth);
 
             const demoForm = document.getElementById('demoForm');
             const submitBtn = document.getElementById('submitBtn');
@@ -548,6 +713,7 @@
 
                 try {
                     const demoData = {
+                        uid: auth.currentUser.uid, // Track user ID
                         name: document.getElementById('fullName').value,
                         email: document.getElementById('email').value,
                         timeline: document.getElementById('timeline').value,
