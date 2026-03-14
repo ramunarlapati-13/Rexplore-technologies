@@ -589,9 +589,18 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        function generateTrackingId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
 
         // Initialize EmailJS
         (function () {
@@ -637,7 +646,7 @@
                 };
             }
 
-            const app = initializeApp(firebaseConfig);
+            const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
             const auth = getAuth(app);
             const db = getFirestore(app);
             const provider = new GoogleAuthProvider();
@@ -723,7 +732,7 @@
 
                         referenceLinks: document.getElementById('referenceLinks').value,
                         requirements: document.getElementById('requirements').value,
-                        status: 'pending',
+                        status: 'received',
                         timestamp: serverTimestamp()
                     };
 
@@ -736,8 +745,9 @@
                         demoData.mobileFeatures = mobileFeatures;
                     }
 
-                    // 1. Save to Firebase demo_requests
-                    const docRef = await addDoc(collection(db, "demo_requests"), demoData);
+                    // 1. Generate Custom ID and Save to Firebase
+                    const trackingId = generateTrackingId();
+                    await setDoc(doc(db, "demo_requests", trackingId), demoData);
 
                     // 2. Send Background Email Alert to ADMIN (FormSubmit)
                     try {
@@ -750,7 +760,7 @@
                             "Timeline": demoData.timeline,
 
                             "Message/Requirements": demoData.requirements,
-                            "Internal Tracking ID": docRef.id,
+                            "Internal Tracking ID": trackingId,
                             _template: "table"
                         };
                         fetch("https://formsubmit.co/ajax/ramunarlapati27@gmail.com", {
@@ -767,13 +777,14 @@
                             to_email: demoData.email,
                             interest: demoData.interest,
                             requirements: demoData.requirements,
-                            message: "Thanks for getting in touch! This is a quick note to let you know that we’ve received your comprehensive project brief and demo request. ✅\nWe are currently reviewing your specific requirements and timeline, and will follow up with you shortly. In the meantime, feel free to browse our latest updates or projects. 💻",
+                            tracking_id: trackingId,
+                            message: `Thanks for getting in touch! We've received your comprehensive project brief and demo request. ✅\n\n**TRACK YOUR STATUS:** You can track the progress of your request anytime on our website using your unique Tracking ID: ${trackingId}\n\nWe are currently reviewing your requirements and will follow up with you shortly. 💻`,
                             company_name: "Rexplore Technologies"
                         });
                     } catch (e) { console.log("Client auto-reply skip:", e); }
 
                     demoForm.reset();
-                    showModal(docRef.id);
+                    showModal(trackingId);
                 } catch (err) {
                     console.error(err);
                     if (err.message.includes('permission-denied')) {
@@ -790,6 +801,69 @@
 
         initDemo();
     </script>
+    <!-- Floating Track Button -->
+    <button class="floating-track-btn" id="openTrackModal">
+        <span class="track-label">Track Your Request</span>
+        🔍
+    </button>
+
+    <!-- Tracking Modal -->
+    <div id="trackModal" class="success-modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3 style="margin-bottom: 1rem;">Track Your Request</h3>
+            <p style="margin-bottom: 1.5rem;">Enter your internal tracking ID to see the current status of your project brief or demo request.</p>
+            
+            <div class="tracking-input-group">
+                <input type="text" id="trackingIdInput" placeholder="EX: 7XzR... (Tracking ID)" 
+                       style="flex: 1; padding: 0.8rem; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                <button id="trackBtn" class="btn btn-primary" style="padding: 0.8rem 1.5rem;">Search</button>
+            </div>
+
+            <div id="trackingResult" class="tracking-result">
+                <div id="statusBadge" class="status-badge" style="display: none;">Status</div>
+                
+                <div class="status-roadmap" id="statusRoadmap">
+                    <div class="roadmap-progress-bar" id="roadmapProgress"></div>
+                    <div class="roadmap-step" data-step="received">
+                        <div class="step-dot">1</div>
+                        <div class="step-label">Received</div>
+                    </div>
+                    <div class="roadmap-step" data-step="reviewed">
+                        <div class="step-dot">2</div>
+                        <div class="step-label">Reviewed</div>
+                    </div>
+                    <div class="roadmap-step" data-step="in-progress">
+                        <div class="step-dot">3</div>
+                        <div class="step-label">In-Progress</div>
+                    </div>
+                    <div class="roadmap-step" data-step="finalizing">
+                        <div class="step-dot">4</div>
+                        <div class="step-label">Finalizing</div>
+                    </div>
+                    <div class="roadmap-step" data-step="live">
+                        <div class="step-dot">🚀</div>
+                        <div class="step-label">Live</div>
+                    </div>
+                </div>
+
+                <div class="track-details">
+                    <p><strong>Request Name:</strong> <span id="trackName"></span></p>
+                    <p><strong>Service:</strong> <span id="trackService"></span></p>
+                    <p><strong>Timeline:</strong> <span id="trackTimeline"></span></p>
+                    <p id="liveStatusLink" style="display: none; color: var(--success-color); font-weight: bold; margin-bottom: 10px;">🎉 Your request is now live!</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Last Updated: <span id="trackTime"></span></p>
+                </div>
+            </div>
+
+            <div id="trackError" style="color: #ef4444; display: none; margin-top: 1rem; font-size: 0.9rem;">
+                Invalid ID, re-enter correctly
+            </div>
+
+            <button class="modal-btn" onclick="closeTrackModal()" style="margin-top: 2rem;">Close</button>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
 </body>
 
 </html>

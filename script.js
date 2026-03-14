@@ -434,8 +434,8 @@ console.log('%cInterested in joining our team? Visit our careers page!', 'color:
 // ================================
 // FIREBASE & TESTIMONIALS
 // ================================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, query, where, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, query, where, orderBy, limit, onSnapshot, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 1. Fetch Config Securely from Serverless API (with Local Fallback)
 let firebaseConfig;
@@ -456,7 +456,7 @@ try {
     console.log("Using local fallback config");
 }
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
 // Dynamic Testimonials Loading
@@ -552,6 +552,156 @@ if (feedbackForm) {
         } finally {
             btn.disabled = false;
             btn.textContent = originalText;
+        }
+    };
+}
+
+// ================================
+// FORM TRACKING LOGIC
+// ================================
+
+const trackModal = document.getElementById('trackModal');
+const trackBtn = document.getElementById('trackBtn');
+const trackingIdInput = document.getElementById('trackingIdInput');
+const trackingResult = document.getElementById('trackingResult');
+const trackError = document.getElementById('trackError');
+const openTrackBtn = document.getElementById('openTrackModal');
+
+const roadmapSteps = ['received', 'reviewed', 'in-progress', 'finalizing', 'live'];
+
+function updateRoadmap(status) {
+    const steps = document.querySelectorAll('.roadmap-step');
+    const progressBar = document.getElementById('roadmapProgress');
+    const liveLink = document.getElementById('liveStatusLink');
+    
+    // Map legacy 'pending' to 'received'
+    if (status === 'pending') status = 'received';
+    
+    if (!status || status === 'rejected') {
+        progressBar.style.width = '0%';
+        steps.forEach(s => s.classList.remove('active', 'completed'));
+        return;
+    }
+
+    const currentIndex = roadmapSteps.indexOf(status.toLowerCase());
+    const progressWidth = (currentIndex / (roadmapSteps.length - 1)) * 100;
+    
+    progressBar.style.width = `${progressWidth}%`;
+    
+    steps.forEach((step, index) => {
+        const stepName = step.dataset.step;
+        step.classList.remove('active', 'completed');
+        
+        if (index < currentIndex) {
+            step.classList.add('completed');
+        } else if (index === currentIndex) {
+            step.classList.add('active');
+        }
+    });
+
+    if (status === 'live' && liveLink) {
+        liveLink.style.display = 'block';
+    } else if (liveLink) {
+        liveLink.style.display = 'none';
+    }
+}
+
+let activeTrackListener = null;
+
+window.closeTrackModal = () => {
+    trackModal.classList.remove('active');
+    setTimeout(() => {
+        trackModal.style.display = 'none';
+        if (activeTrackListener) activeTrackListener(); // Unsubscribe
+    }, 300);
+};
+
+if (openTrackBtn) {
+    openTrackBtn.onclick = () => {
+        trackModal.style.display = 'flex';
+        setTimeout(() => trackModal.classList.add('active'), 10);
+        trackingResult.style.display = 'none';
+        trackError.style.display = 'none';
+        trackingIdInput.value = '';
+    };
+}
+
+if (trackBtn) {
+    trackBtn.onclick = async () => {
+        const inputId = trackingIdInput.value.trim();
+        if (!inputId) return;
+
+        const originalText = trackBtn.textContent;
+        trackBtn.disabled = true;
+        trackBtn.textContent = 'Searching...';
+        trackError.style.display = 'none';
+        trackingResult.style.display = 'none';
+
+        if (activeTrackListener) activeTrackListener();
+
+        const trackRequest = async (idToTry) => {
+            try {
+                const docRef = doc(db, "demo_requests", idToTry);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    // Found it! Now setup real-time listener for future updates
+                    activeTrackListener = onSnapshot(docRef, (snap) => {
+                        if (snap.exists()) renderTrackingData(snap.data());
+                    });
+                    renderTrackingData(docSnap.data());
+                    return true;
+                }
+                return false;
+            } catch (err) {
+                console.error("Search attempt error:", err);
+                return false;
+            }
+        };
+
+        const renderTrackingData = (data) => {
+            trackBtn.disabled = false;
+            trackBtn.textContent = originalText;
+            trackingResult.style.display = 'block';
+            trackError.style.display = 'none';
+            
+            document.getElementById('trackName').textContent = data.name || 'N/A';
+            document.getElementById('trackService').textContent = data.interest || 'N/A';
+            document.getElementById('trackTimeline').textContent = data.timeline || 'N/A';
+            
+            const timestamp = data.timestamp?.toDate();
+            document.getElementById('trackTime').textContent = timestamp ? timestamp.toLocaleString() : 'Recent';
+            
+            const status = data.status || 'received';
+            updateRoadmap(status);
+            
+            const badge = document.getElementById('statusBadge');
+            if (badge) {
+                badge.textContent = status;
+                badge.className = 'status-badge status-' + status.toLowerCase();
+            }
+        };
+
+        try {
+            // Try 1: Exact ID as entered
+            let found = await trackRequest(inputId);
+            
+            // Try 2: Uppercase fallback for new IDs
+            if (!found && inputId.toUpperCase() !== inputId) {
+                found = await trackRequest(inputId.toUpperCase());
+            }
+
+            if (!found) {
+                trackError.style.display = 'block';
+                trackingResult.style.display = 'none';
+                trackBtn.disabled = false;
+                trackBtn.textContent = originalText;
+            }
+        } catch (err) {
+            console.error("Search error:", err);
+            trackError.style.display = 'block';
+            trackBtn.disabled = false;
+            trackBtn.textContent = originalText;
         }
     };
 }

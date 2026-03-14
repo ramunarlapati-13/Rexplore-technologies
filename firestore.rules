@@ -20,8 +20,11 @@ service cloud.firestore {
 
     // Demo requests collection security
     match /demo_requests/{requestId} {
-      // ONLY authenticated admins (specific email) can read or delete
-      allow read, delete: if request.auth != null && request.auth.token.email == "ramunarlapati@gmail.com"; 
+      // Anyone can 'get' a specific request if they have the ID (for tracking)
+      allow get: if true;
+      
+      // ONLY authenticated admins (specific email) can list all requests or delete
+      allow list, delete: if request.auth != null && request.auth.token.email == "ramunarlapati@gmail.com"; 
       
       // Anyone can submit a demo request
       allow create: if request.resource.data.name != "" 

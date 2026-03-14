@@ -502,6 +502,68 @@
         </div>
     </div>
 
+    <!-- Floating Track Button -->
+    <button class="floating-track-btn" id="openTrackModal">
+        <span class="track-label">Track Your Request</span>
+        🔍
+    </button>
+
+    <!-- Tracking Modal -->
+    <div id="trackModal" class="success-modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3 style="margin-bottom: 1rem;">Track Your Request</h3>
+            <p style="margin-bottom: 1.5rem;">Enter your internal tracking ID to see the current status of your project brief or demo request.</p>
+            
+            <div class="tracking-input-group">
+                <input type="text" id="trackingIdInput" placeholder="EX: 7XzR... (Tracking ID)" 
+                       style="flex: 1; padding: 0.8rem; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                <button id="trackBtn" class="btn btn-primary" style="padding: 0.8rem 1.5rem;">Search</button>
+            </div>
+
+            <div id="trackingResult" class="tracking-result">
+                <div id="statusBadge" class="status-badge" style="display: none;">Status</div>
+                
+                <div class="status-roadmap" id="statusRoadmap">
+                    <div class="roadmap-progress-bar" id="roadmapProgress"></div>
+                    <div class="roadmap-step" data-step="received">
+                        <div class="step-dot">1</div>
+                        <div class="step-label">Received</div>
+                    </div>
+                    <div class="roadmap-step" data-step="reviewed">
+                        <div class="step-dot">2</div>
+                        <div class="step-label">Reviewed</div>
+                    </div>
+                    <div class="roadmap-step" data-step="in-progress">
+                        <div class="step-dot">3</div>
+                        <div class="step-label">In-Progress</div>
+                    </div>
+                    <div class="roadmap-step" data-step="finalizing">
+                        <div class="step-dot">4</div>
+                        <div class="step-label">Finalizing</div>
+                    </div>
+                    <div class="roadmap-step" data-step="live">
+                        <div class="step-dot">🚀</div>
+                        <div class="step-label">Live</div>
+                    </div>
+                </div>
+
+                <div class="track-details">
+                    <p><strong>Request Name:</strong> <span id="trackName"></span></p>
+                    <p><strong>Service:</strong> <span id="trackService"></span></p>
+                    <p><strong>Timeline:</strong> <span id="trackTimeline"></span></p>
+                    <p id="liveStatusLink" style="display: none; color: var(--success-color); font-weight: bold; margin-bottom: 10px;">🎉 Your request is now live!</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Last Updated: <span id="trackTime"></span></p>
+                </div>
+            </div>
+
+            <div id="trackError" style="color: #ef4444; display: none; margin-top: 1rem; font-size: 0.9rem;">
+                Invalid ID, re-enter correctly
+            </div>
+
+            <button class="modal-btn" onclick="closeTrackModal()" style="margin-top: 2rem;">Close</button>
+        </div>
+    </div>
+
     <script type="module" src="script.js"></script>
 </body>
 
