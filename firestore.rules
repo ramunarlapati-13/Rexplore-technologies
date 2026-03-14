@@ -20,19 +20,19 @@ service cloud.firestore {
 
     // Demo requests collection security
     match /demo_requests/{requestId} {
-      // Anyone can 'get' a specific request if they have the ID (for tracking)
+      // ✅ Allow anyone to 'get' a specific request if they have the ID (for tracking)
       allow get: if true;
       
-      // ONLY authenticated admins (specific email) can list all requests or delete
-      allow list, delete: if request.auth != null && request.auth.token.email == "ramunarlapati@gmail.com"; 
+      // ❌ ONLY authenticated admins (specific email) can list all requests
+      allow list: if request.auth != null && request.auth.token.email == "ramunarlapati@gmail.com"; 
       
-      // Anyone can submit a demo request
+      // ✅ Anyone can submit a demo request
       allow create: if request.resource.data.name != "" 
                    && request.resource.data.email != ""
                    && request.resource.data.interest != "";
       
-      // ONLY authenticated admins can delete
-      allow update, delete: if request.auth != null;
+      // ❌ ONLY authenticated admins (specific email) can update or delete
+      allow update, delete: if request.auth != null && request.auth.token.email == "ramunarlapati@gmail.com"; 
     }
     
     // Default deny for everything else

@@ -639,29 +639,50 @@ if (trackBtn) {
 
         if (activeTrackListener) activeTrackListener();
 
-        const trackRequest = async (idToTry) => {
-            try {
-                const docRef = doc(db, "demo_requests", idToTry);
-                const docSnap = await getDoc(docRef);
-                
-                if (docSnap.exists()) {
-                    // Found it! Now setup real-time listener for future updates
-                    activeTrackListener = onSnapshot(docRef, (snap) => {
-                        if (snap.exists()) renderTrackingData(snap.data());
-                    });
-                    renderTrackingData(docSnap.data());
-                    return true;
-                }
-                return false;
-            } catch (err) {
-                console.error("Search attempt error:", err);
-                return false;
-            }
-        };
+        try {
+            // Check for the ID exactly as it is (case-sensitive)
+            const docRef = doc(db, "demo_requests", inputId);
+            let docSnap = await getDoc(docRef);
 
-        const renderTrackingData = (data) => {
+            // If not found, try the Uppercase version (for new 8-char IDs)
+            if (!docSnap.exists() && inputId.toUpperCase() !== inputId) {
+                const upRef = doc(db, "demo_requests", inputId.toUpperCase());
+                docSnap = await getDoc(upRef);
+            }
+
+            if (docSnap.exists()) {
+                const activeDocRef = docSnap.ref;
+                activeTrackListener = onSnapshot(activeDocRef, (snap) => {
+                    if (snap.exists()) renderTrackingData(snap.data());
+                }, (err) => {
+                    console.error("Listener error:", err);
+                    if (err.code === 'permission-denied') {
+                        showError("Database access denied. Please update your Firestore Rules.");
+                    }
+                });
+                renderTrackingData(docSnap.data());
+            } else {
+                showError("Invalid Tracking ID. Please double-check capital/small letters.");
+            }
+        } catch (err) {
+            console.error("Tracking error:", err);
+            if (err.code === 'permission-denied') {
+                showError("Permission Denied! Please update your Firestore Rules to allow public tracking.");
+            } else {
+                showError("An error occurred while searching. Please try again.");
+            }
+        } finally {
             trackBtn.disabled = false;
             trackBtn.textContent = originalText;
+        }
+
+        function showError(msg) {
+            trackError.innerHTML = msg || "Invalid ID. Please re-enter correctly.";
+            trackError.style.display = 'block';
+            trackingResult.style.display = 'none';
+        }
+
+        function renderTrackingData(data) {
             trackingResult.style.display = 'block';
             trackError.style.display = 'none';
             
@@ -672,36 +693,9 @@ if (trackBtn) {
             const timestamp = data.timestamp?.toDate();
             document.getElementById('trackTime').textContent = timestamp ? timestamp.toLocaleString() : 'Recent';
             
-            const status = data.status || 'received';
+            // Map 'pending' to 'received' for old records
+            const status = (data.status === 'pending') ? 'received' : (data.status || 'received');
             updateRoadmap(status);
-            
-            const badge = document.getElementById('statusBadge');
-            if (badge) {
-                badge.textContent = status;
-                badge.className = 'status-badge status-' + status.toLowerCase();
-            }
-        };
-
-        try {
-            // Try 1: Exact ID as entered
-            let found = await trackRequest(inputId);
-            
-            // Try 2: Uppercase fallback for new IDs
-            if (!found && inputId.toUpperCase() !== inputId) {
-                found = await trackRequest(inputId.toUpperCase());
-            }
-
-            if (!found) {
-                trackError.style.display = 'block';
-                trackingResult.style.display = 'none';
-                trackBtn.disabled = false;
-                trackBtn.textContent = originalText;
-            }
-        } catch (err) {
-            console.error("Search error:", err);
-            trackError.style.display = 'block';
-            trackBtn.disabled = false;
-            trackBtn.textContent = originalText;
         }
     };
 }

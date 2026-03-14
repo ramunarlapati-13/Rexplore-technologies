@@ -237,7 +237,9 @@
                         content = `
                             <div class="item-info">
                                 <h4>${data.name} - ${data.interest}</h4>
-                                <p><strong>ID:</strong> <code style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:3px;">${id}</code></p>
+                                <p><strong>ID:</strong> <code style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:3px;">${id}</code> 
+                                    <button onclick="copyToClipboard('${id}')" style="background:none; border:none; color:var(--primary-color); cursor:pointer; font-size:0.8rem; margin-left:5px;">📋 Copy</button>
+                                </p>
                                 <p><strong>Email:</strong> ${data.email}</p>
                                 <p><strong>Requirements:</strong> ${data.requirements}</p>
                                 <p><strong>Referral:</strong> ${data.referral}</p>
@@ -290,6 +292,14 @@
                 container.innerHTML = `<p style="color: #ff4757; padding: 20px; background: rgba(255,0,0,0.1); border-radius: 8px;">Error loading data: ${error.message}</p>`;
             });
         }
+
+        window.copyToClipboard = (text) => {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("ID Copied: " + text);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        };
 
         init();
     </script>

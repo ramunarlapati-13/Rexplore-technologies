@@ -772,14 +772,72 @@
 
                     // 3. Send Auto-Reply to CLIENT (EmailJS)
                     try {
+                        const companyName = "Rexplore Technologies";
+                        const primaryColor = "#4f46e5";
+                        const secondaryColor = "#3b82f6";
+                        const textColor = "#1e293b";
+                        const mutedText = "#64748b";
+                        const bgColor = "#f8fafc";
+                        
+                        // Construct the Full Premium HTML Email Body with Inline Styles for cross-client support
+                        const fullEmailHtml = `
+<div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; color: ${textColor}; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
+    <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); padding: 40px 20px; text-align: center; color: white;">
+        <h3 style="margin: 0; font-size: 24px; letter-spacing: 2px; font-weight: 800; color: white;">REXPLORE TECHNOLOGIES</h3>
+        <p style="margin: 5px 0 0; opacity: 0.9; font-size: 15px; color: white;">🗒️ Submission Received! 🚀</p>
+    </div>
+    
+    <div style="padding: 40px 35px; line-height: 1.6;">
+        <p style="font-size: 20px; font-weight: 700; color: ${textColor}; margin-bottom: 20px;">Hi ${demoData.name},</p>
+        <p style="margin-bottom: 30px; color: #475569; font-size: 16px;">
+            Thanks for getting in touch! This is a quick note to let you know that we’ve received your form submission. ✅<br>
+            We are currently reviewing your information and will follow up with you shortly. In the meantime, feel free to browse our latest updates or projects. 💻
+        </p>
+
+        <span style="font-weight: 800; color: ${primaryColor}; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; margin-bottom: 15px; display: block; border-left: 4px solid ${primaryColor}; padding-left: 10px;">Request Summary</span>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px; background-color: ${bgColor}; border-radius: 8px; overflow: hidden;">
+            <tr>
+                <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; font-weight: 700; color: ${mutedText}; width: 35%; background-color: #f1f5f9;">Internal Tracking ID</td>
+                <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; color: ${primaryColor}; font-weight: 800;">${trackingId}</td>
+            </tr>
+            <tr>
+                <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; font-weight: 700; color: ${mutedText}; background-color: #f1f5f9;">Service Interest</td>
+                <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; color: ${textColor}; font-weight: 500;">${demoData.interest}</td>
+            </tr>
+            <tr>
+                <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; font-weight: 700; color: ${mutedText}; background-color: #f1f5f9;">Contact Email</td>
+                <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; color: ${textColor}; font-weight: 500;">${demoData.email}</td>
+            </tr>
+            ${demoData.websiteType ? `<tr><td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; font-weight: 700; color: ${mutedText}; background-color: #f1f5f9;">Website Type</td><td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; color: ${textColor}; font-weight: 500;">${demoData.websiteType}</td></tr>` : ''}
+            <tr>
+                <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; font-weight: 700; color: ${mutedText}; background-color: #f1f5f9; vertical-align: top;">Project Requirements</td>
+                <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; color: ${textColor}; font-weight: 500;">${demoData.requirements}</td>
+            </tr>
+        </table>
+
+        <div style="background: #eef2ff; border: 1px dashed ${primaryColor}; padding: 15px; border-radius: 8px; margin-top: 20px; text-align: center;">
+            <p style="margin: 0; font-weight: 700; color: ${primaryColor};">🔍 TRACK YOUR PROGRESS</p>
+            <p style="margin: 5px 0 0; font-size: 13px; color: ${mutedText};">Use ID <strong>${trackingId}</strong> on our website to see your project roadmap.</p>
+        </div>
+
+        <p style="margin-top: 40px; font-size: 16px;">
+            Best regards,<br>
+            <span style="font-weight: 700; color: ${textColor};">The Team at <a href="https://rexplore-tech.vercel.app/" style="color: ${primaryColor}; text-decoration: none;">${companyName}</a></span>
+        </p>
+    </div>
+
+    <div style="background-color: ${bgColor}; padding: 25px; text-align: center; font-size: 13px; color: #94a3b8; border-top: 1px solid #e2e8f0;">
+        &copy; 2026 <a href="https://rexplore-tech.vercel.app/" style="color: ${primaryColor}; font-weight: 700; text-decoration: none;">${companyName}</a>. All rights reserved.<br>
+        Empowering businesses through digital excellence.
+    </div>
+</div>
+`;
+
                         emailjs.send("rexploretech.mail", "template_8tqr218", {
                             to_name: demoData.name,
                             to_email: demoData.email,
-                            interest: demoData.interest,
-                            requirements: demoData.requirements,
-                            tracking_id: trackingId,
-                            message: `Thanks for getting in touch! We've received your comprehensive project brief and demo request. ✅\n\n**TRACK YOUR STATUS:** You can track the progress of your request anytime on our website using your unique Tracking ID: ${trackingId}\n\nWe are currently reviewing your requirements and will follow up with you shortly. 💻`,
-                            company_name: "Rexplore Technologies"
+                            full_email_html: fullEmailHtml
                         });
                     } catch (e) { console.log("Client auto-reply skip:", e); }
 
