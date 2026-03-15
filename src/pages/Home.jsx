@@ -170,7 +170,7 @@ const Home = () => {
 
 
             {/* Desktop Only Spotlight Effect */}
-            <SpotlightCursor className="hidden md:block" />
+            <SpotlightCursor className="hidden md:block" size={300} />
 
             {/* About Section */}
             <section id="about" className="about reveal">
