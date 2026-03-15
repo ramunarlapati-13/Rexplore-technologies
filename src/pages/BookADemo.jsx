@@ -86,7 +86,7 @@ const BookADemo = () => {
           tracking_id: docRef.id
         }, "N9_E_x9m6v7h9-XqS"); // Simulated public key based on pattern
       } catch (e) {
-        console.log("Email skip:", e);
+        // Silent fail for email - project is still recorded in DB
       }
 
     } catch (err) {
