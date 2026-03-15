@@ -17,20 +17,22 @@ window.addEventListener('scroll', () => {
 });
 
 // Mobile menu toggle
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navMenu.classList.toggle('active');
-    document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : 'auto';
-});
-
-// Close mobile menu when clicking a link
-navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
-        document.body.style.overflow = 'auto';
+if (hamburger && navMenu) {
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+        document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : 'auto';
     });
-});
+
+    // Close mobile menu when clicking a link
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+    });
+}
 
 // Active nav link on scroll
 window.addEventListener('scroll', () => {
@@ -160,74 +162,51 @@ window.addEventListener('scroll', () => {
 const contactForm = document.getElementById('contactForm');
 const formMessage = document.getElementById('formMessage');
 
-contactForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    const formData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        subject: document.getElementById('subject').value,
-        message: document.getElementById('message').value
-    };
+        const formData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            subject: document.getElementById('subject').value,
+            message: document.getElementById('message').value
+        };
 
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.phone || !formData.subject || !formData.message) {
-        showFormMessage('Please fill in all fields.', 'error');
-        return;
-    }
+        // Basic validation
+        if (!formData.name || !formData.email || !formData.phone || !formData.subject || !formData.message) {
+            showFormMessage('Please fill in all fields.', 'error');
+            return;
+        }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-        showFormMessage('Please enter a valid email address.', 'error');
-        return;
-    }
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            showFormMessage('Please enter a valid email address.', 'error');
+            return;
+        }
 
-    // Disable submit button
-    const submitBtn = contactForm.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Sending...';
-    submitBtn.disabled = true;
+        // Disable submit button
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
 
-    // Simulate form submission (replace with actual API call)
-    setTimeout(() => {
-        showFormMessage('Thank you for your message! We\'ll get back to you soon.', 'success');
-        contactForm.reset();
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-
-        // Hide message after 5 seconds
+        // Simulate form submission
         setTimeout(() => {
-            formMessage.style.display = 'none';
-        }, 5000);
-    }, 1500);
-
-    // In production, replace the setTimeout above with actual API call:
-    /*
-    try {
-        const response = await fetch('/api/contact', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-        
-        if (response.ok) {
             showFormMessage('Thank you for your message! We\'ll get back to you soon.', 'success');
             contactForm.reset();
-        } else {
-            throw new Error('Failed to send message');
-        }
-    } catch (error) {
-        showFormMessage('Oops! Something went wrong. Please try again later.', 'error');
-    } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    }
-    */
-});
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+
+            // Hide message after 5 seconds
+            setTimeout(() => {
+                formMessage.style.display = 'none';
+            }, 5000);
+        }, 1500);
+    });
+}
 
 const showFormMessage = (message, type) => {
     formMessage.textContent = message;
@@ -241,58 +220,35 @@ const showFormMessage = (message, type) => {
 
 const newsletterForm = document.getElementById('newsletterForm');
 
-newsletterForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+if (newsletterForm) {
+    newsletterForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    const emailInput = newsletterForm.querySelector('input[type="email"]');
-    const email = emailInput.value;
-    const submitBtn = newsletterForm.querySelector('button');
+        const emailInput = newsletterForm.querySelector('input[type="email"]');
+        const email = emailInput.value;
+        const submitBtn = newsletterForm.querySelector('button');
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        alert('Please enter a valid email address.');
-        return;
-    }
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert('Please enter a valid email address.');
+            return;
+        }
 
-    // Disable submit button
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = '✓';
-    submitBtn.disabled = true;
+        // Disable submit button
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = '✓';
+        submitBtn.disabled = true;
 
-    // Simulate subscription (replace with actual API call)
-    setTimeout(() => {
-        alert('Thank you for subscribing to our newsletter!');
-        newsletterForm.reset();
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    }, 1000);
-
-    // In production, replace with actual API call:
-    /*
-    try {
-        const response = await fetch('/api/newsletter', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email })
-        });
-        
-        if (response.ok) {
+        // Simulate subscription
+        setTimeout(() => {
             alert('Thank you for subscribing to our newsletter!');
             newsletterForm.reset();
-        } else {
-            throw new Error('Failed to subscribe');
-        }
-    } catch (error) {
-        alert('Oops! Something went wrong. Please try again later.');
-    } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    }
-    */
-});
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }, 1000);
+    });
+}
 
 // ================================
 // PARALLAX EFFECT

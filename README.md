@@ -10,10 +10,10 @@ A high-performance, premium company website for Rexplore Technologies. Built wit
 *   **Web Tracking Modal**: Integrated roadmap visualization showing project progress (Received → Reviewed → In-Progress → Finalizing → Live).
 *   **Telegram Bot Integration**: Direct link to the `@rexplorebot` for mobile-native tracking and support.
 
-### 2. Intelligent Demo Request & Briefing System
+### 2. Intelligent Project Briefing System
 *   **Branching Form Logic**: Dynamic form fields in `book-a-demo.html` that adapt based on the selected service (e.g., specific options for Web Development vs. Mobile Apps).
 *   **Firebase Authentication**: Secure Google Sign-In required for submitting briefs, ensuring verified client identities.
-*   **Comprehensive Data Capture**: Collects project goals, timelines, design preferences (Minimalist, Corporate, etc.), and contact details including validated **Mobile Numbers**.
+*   **Comprehensive Data Capture**: Collects project goals, budget ranges (**Under $1k - $10k+**), timelines, design preferences, and contact details including validated **Mobile Numbers**.
 
 ### 3. User Personalization (Client Profile)
 *   **Profile Page (`profile.html`)**: A dedicated dashboard for clients to:
@@ -24,11 +24,11 @@ A high-performance, premium company website for Rexplore Technologies. Built wit
 
 ### 4. Robust Admin Ecosystem
 *   **Admin Dashboard (`admin.html`)**: A secure, real-time command center for managing:
-    *   **Project Briefs**: View full requirements, contact details (Email/Phone), and update roadmap statuses.
+    *   **Project Management**: Track projects from "Received" to "Live" with full control over statuses and client data (Name, Email, Mobile, Budget).
     *   **Testimonials**: Approve or hide public reviews before they appear on the homepage.
-    *   **Client Management**: Full CRUD operations for all database records.
+    *   **Excel Reporting**: One-click generation of professional project reports in `.xlsx` format for offline analysis.
 *   **Multi-Channel Alerts**: 
-    *   **Telegram Admin Alerts**: Real-time notifications sent to the admin's Telegram when a new request is submitted.
+    *   **Telegram Admin Alerts**: Instant notifications containing client info, interest, mobile, and budget for immediate follow-up.
     *   **FormSubmit Emails**: Detailed project summaries sent to admin email for archival.
     *   **Auto-Replies**: Professional HTML emails sent to clients via **EmailJS** immediately after submission.
 
@@ -73,6 +73,7 @@ The Rexplore ecosystem is built on a modern, scalable, and high-performance stac
 
 ### 🛰️ Enterprise Integrations
 - **Telegram Bot API**: Instant real-time notifications for admins, enabling rapid response to new leads.
+- **XLSX (SheetJS)**: Integration for client-side generation and download of professional Excel project reports.
 - **EmailJS SDK**: High-reliability transactional email delivery for automated client follow-ups.
 - **FormSubmit.co**: Encrypted background email service for administrative data archival.
 - **Font Awesome 6 Pro**: Professional vector icon library for crisp, high-resolution visual cues.

@@ -6,8 +6,15 @@ export default async function handler(req, res) {
     // 1. Handle Admin Alerts (POST request from Website)
     if (req.method === 'POST' && req.body.type === 'admin_alert') {
         try {
-            const { name, interest, id, referral } = req.body.data;
-            const message = `🔔 *New Demo Request!*\n\n👤 *Name:* ${name}\n🚀 *Interest:* ${interest}\n🆔 *ID:* \`${id}\`\n🎁 *Referral:* ${referral || 'None'}`;
+            const { name, interest, id, referral, phone, budget } = req.body.data;
+            const message = `🔔 *New Project Brief!*\n\n` +
+                            `👤 *Name:* ${name}\n` +
+                            `📧 *Email:* ${req.body.data.email}\n` +
+                            `📱 *Mobile:* ${phone}\n` +
+                            `🚀 *Interest:* ${interest}\n` +
+                            `💰 *Budget:* ${budget}\n` +
+                            `🆔 *ID:* \`${id}\`\n` +
+                            `🎁 *Referral:* ${referral || 'None'}`;
             
             await sendMessage(ADMIN_CHAT_ID, message);
             return res.status(200).json({ success: true });

@@ -470,6 +470,18 @@
                                     <input type="tel" id="phone" name="phone" placeholder="+91 1234567890" required>
                                 </div>
                                 <div class="form-group">
+                                    <label for="budget">Approximate Budget (INR) *</label>
+                                    <select id="budget" name="budget" required>
+                                        <option value="" disabled selected>Select Budget Range...</option>
+                                        <option value="₹1,500 - ₹5,000">₹1,500 - ₹5,000</option>
+                                        <option value="₹5,000 - ₹10,000">₹5,000 - ₹10,000</option>
+                                        <option value="₹10,000 - ₹15,000">₹10,000 - ₹15,000</option>
+                                        <option value="₹15,000 - ₹20,000">₹15,000 - ₹20,000</option>
+                                        <option value="Above ₹20,000">Above ₹20,000</option>
+                                        <option value="Flexible">Flexible / Custom</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label for="timeline">Project Timeline *</label>
                                     <select id="timeline" name="timeline" required>
                                         <option value="" disabled selected>Select Timeline...</option>
@@ -651,7 +663,7 @@
         <div class="modal-content">
             <div class="modal-icon">✓</div>
             <h3 id="modalTitle">Request Received!</h3>
-            <p id="modalMessage">Your demo request and project brief have been submitted successfully.</p>
+            <p id="modalMessage">Your project brief has been submitted successfully.</p>
             <button class="modal-btn" onclick="location.href='index.html'">Back to Home</button>
         </div>
     </div>
@@ -804,7 +816,7 @@
                     const refLink = `${window.location.protocol}//${window.location.host}${window.location.pathname}?ref=${user.email}`;
 
                     message.innerHTML = `
-                        Your demo request and brief have been submitted successfully.<br><br>
+                        Your project brief has been submitted successfully.<br><br>
                         
                         <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; text-align: center;">
                             <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Your Tracking ID:</span>
@@ -853,6 +865,7 @@
                         name: document.getElementById('fullName').value,
                         email: document.getElementById('email').value,
                         phone: document.getElementById('phone').value,
+                        budget: document.getElementById('budget').value,
                         timeline: document.getElementById('timeline').value,
                         referral: document.getElementById('referral').value || 'none',
                         interest: domain,
@@ -880,10 +893,11 @@
                     // 2. Send Background Email Alert to ADMIN (FormSubmit)
                     try {
                         let emailBody = {
-                            _subject: "🚀 New Demo / Brief from " + demoData.name,
+                            _subject: "🚀 New Project Brief from " + demoData.name,
                             "Client Name": demoData.name,
                             "Email Address": demoData.email,
                             "Mobile Number": demoData.phone,
+                            "Approximate Budget": demoData.budget,
                             "Service Interest": demoData.interest,
                             "Referral Source": demoData.referral,
                             "Timeline": demoData.timeline,
@@ -911,6 +925,7 @@
                                     email: demoData.email,
                                     phone: demoData.phone,
                                     interest: demoData.interest,
+                                    budget: demoData.budget,
                                     id: trackingId,
                                     referral: demoData.referral
                                 }
@@ -957,6 +972,10 @@
                 <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; font-weight: 700; color: ${mutedText}; background-color: #f1f5f9;">Contact Info</td>
                 <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; color: ${textColor}; font-weight: 500;">Email: ${demoData.email}<br>Phone: ${demoData.phone}</td>
             </tr>
+            <tr>
+                <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; font-weight: 700; color: ${mutedText}; background-color: #f1f5f9;">Budget Range</td>
+                <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; color: ${textColor}; font-weight: 500;">${demoData.budget}</td>
+            </tr>
             ${demoData.websiteType ? `<tr><td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; font-weight: 700; color: ${mutedText}; background-color: #f1f5f9;">Website Type</td><td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; color: ${textColor}; font-weight: 500;">${demoData.websiteType}</td></tr>` : ''}
             <tr>
                 <td style="padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; font-weight: 700; color: ${mutedText}; background-color: #f1f5f9; vertical-align: top;">Project Requirements</td>
@@ -1000,30 +1019,43 @@
                     }
                 } finally {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Schedule My Demo & Submit Brief';
+                    submitBtn.textContent = 'Submit Project Brief';
                 }
             });
         }
 
         initDemo();
     </script>
-    <!-- Floating Track Button -->
-    <button class="floating-track-btn" id="openTrackModal">
-        <span class="track-label">Track Your Request</span>
-        🔍
-    </button>
+    <!-- Tracking Dock (Bottom Left) -->
+    <div class="tracking-dock">
+        <!-- Web Tracking Button -->
+        <button class="dock-item web-track" id="openTrackModal" title="Web Tracking">
+            <span class="dock-tooltip">Web Tracking</span>
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+
+        <!-- Telegram Tracking Button -->
+        <a href="https://t.me/rexplorebot" target="_blank" class="dock-item telegram-track" title="Telegram Tracking">
+            <div class="telegram-pulse"></div>
+            <i class="fab fa-telegram-plane"></i>
+            <span class="dock-tooltip">Telegram Bot</span>
+            <span class="dock-badge">NEW 🤖</span>
+        </a>
+    </div>
 
     <!-- Tracking Modal -->
     <div id="trackModal" class="success-modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <h3 style="margin-bottom: 1rem;">Track Your Request</h3>
-            <p style="margin-bottom: 1.5rem;">Enter your internal tracking ID to see the current status of your project
-                brief or demo request.</p>
+        <div class="modal-content tracking-modal-box">
+            <div class="modal-header">
+                <h3>Track Your Request</h3>
+                <p>Enter your internal tracking ID to see the current status of your project or professional service request.</p>
+            </div>
 
             <div class="tracking-input-group">
-                <input type="text" id="trackingIdInput" placeholder="EX: 7XzR... (Tracking ID)"
-                    style="flex: 1; padding: 0.8rem; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid rgba(255,255,255,0.1); color: white;">
-                <button id="trackBtn" class="btn btn-primary" style="padding: 0.8rem 1.5rem;">Search</button>
+                <input type="text" id="trackingIdInput" placeholder="EX: 7XzR... (Tracking ID)">
+                <button id="trackBtn" class="btn btn-primary">
+                    <i class="fa-solid fa-magnifying-glass"></i> Search
+                </button>
             </div>
 
             <div id="trackingResult" class="tracking-result">
@@ -1054,22 +1086,40 @@
                 </div>
 
                 <div class="track-details">
-                    <p><strong>Request Name:</strong> <span id="trackName"></span></p>
-                    <p><strong>Service:</strong> <span id="trackService"></span></p>
-                    <p><strong>Timeline:</strong> <span id="trackTimeline"></span></p>
-                    <p id="liveStatusLink"
-                        style="display: none; color: var(--success-color); font-weight: bold; margin-bottom: 10px;">🎉
-                        Your request is now live!</p>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Last Updated: <span
-                            id="trackTime"></span></p>
+                    <div class="track-info-row">
+                        <span class="label">Request Name</span>
+                        <span id="trackName" class="value"></span>
+                    </div>
+                    <div class="track-info-row">
+                        <span class="label">Service</span>
+                        <span id="trackService" class="value"></span>
+                    </div>
+                    <div class="track-info-row">
+                        <span class="label">Timeline</span>
+                        <span id="trackTimeline" class="value"></span>
+                    </div>
+                    
+                    <p id="liveStatusLink" class="live-status-alert">
+                       <i class="fa-solid fa-circle-check"></i> Your request is now live!
+                    </p>
+                    
+                    <div class="track-footer">
+                        <span>Last Updated: <span id="trackTime"></span></span>
+                    </div>
                 </div>
             </div>
 
-            <div id="trackError" style="color: #ef4444; display: none; margin-top: 1rem; font-size: 0.9rem;">
-                Invalid ID, re-enter correctly
+            <div id="trackError" class="track-error-msg">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <div>
+                    <strong>Invalid ID</strong>
+                    <span>Please re-enter correctly (IDs are case-sensitive).</span>
+                </div>
             </div>
 
-            <button class="modal-btn" onclick="closeTrackModal()" style="margin-top: 2rem;">Close</button>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-full" onclick="closeTrackModal()">Close Tracking</button>
+            </div>
         </div>
     </div>
 

@@ -171,7 +171,7 @@
 
             <div class="tabs">
                 <button class="tab-btn active" data-target="testimonialsList">Testimonials</button>
-                <button class="tab-btn" data-target="demoList">Demo Requests</button>
+                <button class="tab-btn" data-target="demoList">Projects</button>
                 <button class="tab-btn" data-target="referralStats">Referral Stats</button>
             </div>
 
@@ -180,7 +180,7 @@
             </div>
 
             <div id="demoList" class="data-list">
-                <p>Loading demo requests...</p>
+                <p>Loading projects...</p>
             </div>
 
             <div id="referralStats" class="data-list">
@@ -484,7 +484,8 @@
                 'Status': item.status || 'Received',
                 'Name': item.name,
                 'Email': item.email,
-                'Phone': item.phone || 'N/A',
+                'Mobile Number': item.phone || 'N/A',
+                'Budget': item.budget || 'N/A',
                 'Interest': item.interest,
                 'Timeline': item.timeline || 'N/A',
                 'Requirements': item.requirements || 'N/A',
@@ -500,7 +501,8 @@
                 {wch: 12}, // Status
                 {wch: 20}, // Name
                 {wch: 25}, // Email
-                {wch: 15}, // Phone
+                {wch: 15}, // Mobile Number
+                {wch: 15}, // Budget
                 {wch: 25}, // Interest
                 {wch: 20}, // Timeline
                 {wch: 40}, // Requirements
@@ -510,11 +512,11 @@
 
             // Create Workbook
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Demo Requests");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Projects");
 
             // Generate Filename
             const date = new Date().toISOString().split('T')[0];
-            const filename = `Rexplore_Demo_Requests_${date}.xlsx`;
+            const filename = `Rexplore_Projects_${date}.xlsx`;
 
             // Download File
             XLSX.writeFile(workbook, filename);

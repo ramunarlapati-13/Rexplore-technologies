@@ -369,5 +369,104 @@
             });
         };
     </script>
+    <!-- Tracking Dock (Bottom Left) -->
+    <div class="tracking-dock">
+        <!-- Web Tracking Button -->
+        <button class="dock-item web-track" id="openTrackModal" title="Web Tracking">
+            <span class="dock-tooltip">Web Tracking</span>
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+
+        <!-- Telegram Tracking Button -->
+        <a href="https://t.me/rexplorebot" target="_blank" class="dock-item telegram-track" title="Telegram Tracking">
+            <div class="telegram-pulse"></div>
+            <i class="fab fa-telegram-plane"></i>
+            <span class="dock-tooltip">Telegram Bot</span>
+            <span class="dock-badge">NEW 🤖</span>
+        </a>
+    </div>
+
+    <!-- Tracking Modal -->
+    <div id="trackModal" class="success-modal">
+        <div class="modal-content tracking-modal-box">
+            <div class="modal-header">
+                <h3>Track Your Request</h3>
+                <p>Enter your internal tracking ID to see the current status of your project or professional service request.</p>
+            </div>
+
+            <div class="tracking-input-group">
+                <input type="text" id="trackingIdInput" placeholder="EX: 7XzR... (Tracking ID)">
+                <button id="trackBtn" class="btn btn-primary">
+                    <i class="fa-solid fa-magnifying-glass"></i> Search
+                </button>
+            </div>
+
+            <div id="trackingResult" class="tracking-result">
+                <div id="statusBadge" class="status-badge" style="display: none;">Status</div>
+
+                <div class="status-roadmap" id="statusRoadmap">
+                    <div class="roadmap-progress-bar" id="roadmapProgress"></div>
+                    <div class="roadmap-step" data-step="received">
+                        <div class="step-dot">1</div>
+                        <div class="step-label">Received</div>
+                    </div>
+                    <div class="roadmap-step" data-step="reviewed">
+                        <div class="step-dot">2</div>
+                        <div class="step-label">Reviewed</div>
+                    </div>
+                    <div class="roadmap-step" data-step="in-progress">
+                        <div class="step-dot">3</div>
+                        <div class="step-label">In-Progress</div>
+                    </div>
+                    <div class="roadmap-step" data-step="finalizing">
+                        <div class="step-dot">4</div>
+                        <div class="step-label">Finalizing</div>
+                    </div>
+                    <div class="roadmap-step" data-step="live">
+                        <div class="step-dot">🚀</div>
+                        <div class="step-label">Live</div>
+                    </div>
+                </div>
+
+                <div class="track-details">
+                    <div class="track-info-row">
+                        <span class="label">Request Name</span>
+                        <span id="trackName" class="value"></span>
+                    </div>
+                    <div class="track-info-row">
+                        <span class="label">Service</span>
+                        <span id="trackService" class="value"></span>
+                    </div>
+                    <div class="track-info-row">
+                        <span class="label">Timeline</span>
+                        <span id="trackTimeline" class="value"></span>
+                    </div>
+                    
+                    <p id="liveStatusLink" class="live-status-alert">
+                       <i class="fa-solid fa-circle-check"></i> Your request is now live!
+                    </p>
+                    
+                    <div class="track-footer">
+                        <span>Last Updated: <span id="trackTime"></span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="trackError" class="track-error-msg">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <div>
+                    <strong>Invalid ID</strong>
+                    <span>Please re-enter correctly (IDs are case-sensitive).</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-full" onclick="closeTrackModal()">Close Tracking</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
+
