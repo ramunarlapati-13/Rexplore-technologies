@@ -74,6 +74,7 @@ const Admin = () => {
             'Budget': p.budget,
             'Status': p.status,
             'Service': p.interest,
+            'Subcategory': p.interestSubcategory || '',
             'Timeline': p.timeline,
             'Requirements': p.requirements,
             'Date': p.timestamp?.toDate().toLocaleString()
@@ -138,7 +139,7 @@ const Admin = () => {
                                             <p><strong>Email:</strong> {p.email}</p>
                                             <p><strong>Status:</strong> {p.status}</p>
                                         </div>
-                                        <p><strong>Interest:</strong> {p.interest}</p>
+                                        <p><strong>Major Requirement:</strong> {p.interest}{p.interestSubcategory ? ` - ${p.interestSubcategory}` : ''}</p>
                                     </div>
                                     <div className="item-actions">
                                         <select value={p.status} onChange={(e) => handleUpdateStatus('demo_requests', p.id, e.target.value)}>

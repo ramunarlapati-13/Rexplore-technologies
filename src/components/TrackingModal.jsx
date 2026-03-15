@@ -110,7 +110,10 @@ const TrackingModal = ({ isOpen, onClose }) => {
               </div>
               <div className="track-info-row">
                 <span className="label">Service</span>
-                <span className="value">{result.interest}</span>
+                <span className="value">
+                  {result.interest}
+                  {result.interestSubcategory ? ` - ${result.interestSubcategory}` : ''}
+                </span>
               </div>
               <div className="track-info-row">
                 <span className="label">Timeline</span>

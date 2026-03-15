@@ -63,6 +63,9 @@ const Profile = () => {
                                         <div className="request-body">
                                             <p><strong>Tracking ID:</strong> <code>{req.id}</code></p>
                                             <p><strong>Submitted:</strong> {req.timestamp?.toDate().toLocaleDateString()}</p>
+                                            {req.interestSubcategory && (
+                                                <p><strong>Subcategory:</strong> {req.interestSubcategory}</p>
+                                            )}
                                             <p><strong>Timeline:</strong> {req.timeline}</p>
                                         </div>
                                     </div>

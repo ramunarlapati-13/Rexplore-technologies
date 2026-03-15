@@ -11,7 +11,7 @@ export default async function handler(req, res) {
                             `👤 *Name:* ${name}\n` +
                             `📧 *Email:* ${req.body.data.email}\n` +
                             `📱 *Mobile:* ${phone}\n` +
-                            `🚀 *Interest:* ${interest}\n` +
+                            `🚀 *Major Requirement:* ${interest}\n` +
                             `💰 *Budget:* ${budget}\n` +
                             `🆔 *ID:* \`${id}\`\n` +
                             `🎁 *Referral:* ${referral || 'None'}`;
@@ -77,9 +77,10 @@ export default async function handler(req, res) {
                 const data = parseFirestore(doc.fields);
                 
                 const status = (data.status || 'Received').toUpperCase();
+                const service = `${data.interest || ''}${data.interestSubcategory ? ` - ${data.interestSubcategory}` : ''}`.trim();
                 let message = `📦 *Project Status Lookup*\n\n`;
                 message += `👤 *Client:* ${data.name}\n`;
-                message += `🚀 *Service:* ${data.interest}\n\n`;
+                message += `🚀 *Service:* ${service || 'N/A'}\n\n`;
                 message += `📊 *Current Stage:* ${status}\n`;
                 message += `📅 *Timeline:* ${data.timeline || 'TBD'}\n`;
                 message += `\n🔗 [View Full Profile](https://rexplore-tech.vercel.app/profile)`;

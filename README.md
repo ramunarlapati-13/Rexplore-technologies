@@ -17,7 +17,7 @@ A high-performance, premium company website for Rexplore Technologies, now migra
 *   **Telegram Bot Integration**: Direct link to the `@rexplorebot` for mobile-native tracking and support.
 
 ### 3. Intelligent Project Briefing System
-*   **Dynamic Forms**: React-controlled form components that capture project goals, budget ranges (**Under $1k - $10k+**), timelines, and contact details including validated **Mobile Numbers**.
+*   **Dynamic Forms**: React-controlled form components that capture project goals, budget ranges (**INR 1,500 - INR 20,000**), timelines, and contact details including validated **Mobile Numbers**.
 *   **Firebase Integration**: Secure Google Sign-In and real-time Firestore updates.
 
 ### 4. Robust Admin Ecosystem
@@ -66,4 +66,3 @@ Rexplore-technologies/
     ```
 
 Built with ❤️ for Rexplore Technologies | Innovative Tech Solutions
-
