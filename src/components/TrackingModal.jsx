@@ -71,6 +71,15 @@ const TrackingModal = ({ isOpen, onClose }) => {
     return statusMap[result.status] || '0%';
   };
 
+  const formatDate = (timestamp) => {
+    if (!timestamp) return 'Recent';
+    const date = timestamp.toDate();
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+  };
+
   return (
     <div className="success-modal active">
       <div className="modal-content tracking-modal-box">
@@ -127,7 +136,7 @@ const TrackingModal = ({ isOpen, onClose }) => {
               )}
               
               <div className="track-footer">
-                <span>Last Updated: {result.timestamp?.toDate().toLocaleString() || 'Recent'}</span>
+                <span>Last Updated: {formatDate(result.timestamp)}</span>
               </div>
             </div>
           </div>

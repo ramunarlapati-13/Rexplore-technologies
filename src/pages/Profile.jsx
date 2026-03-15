@@ -9,6 +9,15 @@ const Profile = () => {
     const [requests, setRequests] = useState([]);
     const navigate = useNavigate();
 
+    const formatDate = (timestamp) => {
+        if (!timestamp) return 'N/A';
+        const date = timestamp.toDate();
+        const dd = String(date.getDate()).padStart(2, '0');
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const yyyy = date.getFullYear();
+        return `${dd}-${mm}-${yyyy}`;
+    };
+
     useEffect(() => {
         if (!user) {
             navigate('/');
@@ -40,33 +49,63 @@ const Profile = () => {
                             </div>
                         </div>
                         <div className="profile-actions">
-                            {isAdmin && <Link to="/admin" className="btn btn-primary">Admin Dashboard</Link>}
-                            <button onClick={logout} className="btn btn-secondary">Logout</button>
+                            {isAdmin && (
+                                <Link to="/admin" className="btn-outline-primary">
+                                    <i className="fa-solid fa-gauge-high"></i> Admin
+                                </Link>
+                            )}
+                            <button onClick={logout} className="btn-outline-danger">
+                                <i className="fa-solid fa-right-from-bracket"></i> Logout
+                            </button>
                         </div>
                     </div>
 
                     <div className="requests-section">
                         <h2>Your Project Briefs</h2>
                         {requests.length === 0 ? (
-                            <div className="no-data">
-                                <p>You haven't submitted any project briefs yet.</p>
-                                <Link to="/book-a-demo" className="btn btn-primary">Start a Project</Link>
+                            <div className="no-data-card">
+                                <div className="no-data-icon">
+                                    <i className="fa-solid fa-folder-plus"></i>
+                                </div>
+                                <h3>No projects yet</h3>
+                                <p>Start your journey by booking a project brief today.</p>
+                                <Link to="/book-a-demo" className="btn-glow-primary">
+                                    <i className="fa-solid fa-plus"></i> Start a Project
+                                </Link>
                             </div>
                         ) : (
                             <div className="requests-grid">
                                 {requests.map(req => (
                                     <div key={req.id} className="request-card">
-                                        <div className="request-header">
-                                            <h3>{req.interest}</h3>
-                                            <span className={`status-badge ${req.status}`}>{req.status}</span>
+                                        <div className="card-head">
+                                            <div className="title-section">
+                                                <i className="fa-solid fa-folder-open"></i>
+                                                <h3>{req.interest}</h3>
+                                            </div>
+                                            <span className={`status-indicator status-${req.status}`}>{req.status}</span>
                                         </div>
-                                        <div className="request-body">
-                                            <p><strong>Tracking ID:</strong> <code>{req.id}</code></p>
-                                            <p><strong>Submitted:</strong> {req.timestamp?.toDate().toLocaleDateString()}</p>
-                                            {req.interestSubcategory && (
-                                                <p><strong>Subcategory:</strong> {req.interestSubcategory}</p>
-                                            )}
-                                            <p><strong>Timeline:</strong> {req.timeline}</p>
+                                        
+                                        <div className="card-body">
+                                            <div className="card-meta-grid">
+                                                <div className="meta-item">
+                                                    <label><i className="fa-solid fa-fingerprint"></i> Tracking ID</label>
+                                                    <code>{req.id.slice(-8).toUpperCase()}</code>
+                                                </div>
+                                                <div className="meta-item">
+                                                    <label><i className="fa-regular fa-calendar"></i> Date</label>
+                                                    <span>{formatDate(req.timestamp)}</span>
+                                                </div>
+                                                <div className="meta-item">
+                                                    <label><i className="fa-solid fa-hourglass-half"></i> Timeline</label>
+                                                    <span>{req.timeline}</span>
+                                                </div>
+                                                {req.interestSubcategory && (
+                                                    <div className="meta-item">
+                                                        <label><i className="fa-solid fa-tags"></i> Segment</label>
+                                                        <span>{req.interestSubcategory}</span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

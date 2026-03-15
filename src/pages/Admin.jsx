@@ -13,6 +13,15 @@ const Admin = () => {
     const [projects, setProjects] = useState([]);
     const [leaderboard, setLeaderboard] = useState([]);
 
+    const formatDate = (timestamp) => {
+        if (!timestamp) return 'N/A';
+        const date = timestamp.toDate();
+        const dd = String(date.getDate()).padStart(2, '0');
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const yyyy = date.getFullYear();
+        return `${dd}-${mm}-${yyyy}`;
+    };
+
     useEffect(() => {
         if (!isAdmin) {
             navigate('/');
@@ -93,14 +102,22 @@ const Admin = () => {
                     <h1>Admin Dashboard</h1>
                     <div className="admin-actions">
                         <button onClick={handleExport} className="btn btn-primary" style={{ background: '#10b981' }}>Export Excel</button>
-                        <button onClick={logout} className="btn btn-secondary">Logout</button>
+                        <button onClick={logout} className="btn-outline-danger">
+                            <i className="fa-solid fa-right-from-bracket"></i> Logout
+                        </button>
                     </div>
                 </div>
 
                 <div className="tabs">
-                    <button className={`tab-btn ${activeTab === 'testimonials' ? 'active' : ''}`} onClick={() => setActiveTab('testimonials')}>Testimonials</button>
-                    <button className={`tab-btn ${activeTab === 'projects' ? 'active' : ''}`} onClick={() => setActiveTab('projects')}>Projects</button>
-                    <button className={`tab-btn ${activeTab === 'leaderboard' ? 'active' : ''}`} onClick={() => setActiveTab('leaderboard')}>Leaderboard</button>
+                    <button className={`tab-btn ${activeTab === 'testimonials' ? 'active' : ''}`} onClick={() => setActiveTab('testimonials')}>
+                        <i className="fa-solid fa-comments"></i> Testimonials
+                    </button>
+                    <button className={`tab-btn ${activeTab === 'projects' ? 'active' : ''}`} onClick={() => setActiveTab('projects')}>
+                        <i className="fa-solid fa-clipboard-list"></i> Demo Requests
+                    </button>
+                    <button className={`tab-btn ${activeTab === 'leaderboard' ? 'active' : ''}`} onClick={() => setActiveTab('leaderboard')}>
+                        <i className="fa-solid fa-trophy"></i> Leaderboard
+                    </button>
                 </div>
 
                 <div className="admin-content">
@@ -108,18 +125,36 @@ const Admin = () => {
                         <div className="data-list active">
                             {testimonials.map(t => (
                                 <div key={t.id} className="admin-item">
-                                    <div className="item-info">
-                                        <h4>{t.name} ({t.rating} Stars)</h4>
-                                        <p>"{t.text}"</p>
-                                        <span className="meta">{t.timestamp?.toDate().toLocaleString()}</span>
+                                    <div className="item-main">
+                                        <div className="item-head">
+                                            <div className="title-section">
+                                                <h4>{t.name}</h4>
+                                                <span className="id-badge">#{t.id.slice(-6).toUpperCase()}</span>
+                                            </div>
+                                            <span className={`status-indicator status-${t.status}`}>{t.status}</span>
+                                        </div>
+                                        <div className="item-body">
+                                            <div className="rating-display">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <i key={i} className={`fa-star ${i < Number(t.rating) ? 'fa-solid' : 'fa-regular'}`} style={{ color: i < Number(t.rating) ? '#fbbf24' : 'rgba(255,255,255,0.1)' }}></i>
+                                                ))}
+                                            </div>
+                                            <p className="testimonial-text">"{t.text}"</p>
+                                            <div className="item-meta">
+                                                <i className="fa-regular fa-clock"></i>
+                                                <span>{formatDate(t.timestamp)}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="item-actions">
-                                        <select value={t.status} onChange={(e) => handleUpdateStatus('testimonials', t.id, e.target.value)}>
-                                            <option value="pending">Pending</option>
-                                            <option value="approved">Approved</option>
-                                            <option value="hidden">Hidden</option>
-                                        </select>
-                                        <button onClick={() => handleDelete('testimonials', t.id)} className="btn-danger"><i className="fa-solid fa-trash"></i></button>
+                                    <div className="item-ctrl">
+                                        <div className="ctrl-group">
+                                            <select value={t.status} onChange={(e) => handleUpdateStatus('testimonials', t.id, e.target.value)}>
+                                                <option value="pending">Pending</option>
+                                                <option value="approved">Approved</option>
+                                                <option value="hidden">Hidden</option>
+                                            </select>
+                                            <button onClick={() => handleDelete('testimonials', t.id)} className="btn-action-danger" title="Delete record"><i className="fa-solid fa-trash-can"></i></button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -130,27 +165,59 @@ const Admin = () => {
                         <div className="data-list active">
                             {projects.map(p => (
                                 <div key={p.id} className="admin-item">
-                                    <div className="item-info">
-                                        <div className="flex-between">
-                                            <h4>{p.name}</h4>
-                                            <code>{p.id}</code>
+                                    <div className="item-main">
+                                        <div className="item-head">
+                                            <div className="title-section">
+                                                <h4>{p.name}</h4>
+                                                <span className="id-badge">#{p.id.slice(-6).toUpperCase()}</span>
+                                            </div>
+                                            <div className="service-pill">
+                                                <i className="fa-solid fa-microchip"></i>
+                                                <span>{p.interest}{p.interestSubcategory ? ` — ${p.interestSubcategory}` : ''}</span>
+                                            </div>
                                         </div>
-                                        <div className="grid-2">
-                                            <p><strong>Email:</strong> {p.email}</p>
-                                            <p><strong>Status:</strong> {p.status}</p>
+                                        
+                                        <div className="item-body">
+                                            <div className="data-grid">
+                                                <div className="data-cell">
+                                                    <label><i className="fa-regular fa-envelope"></i> Email</label>
+                                                    <span>{p.email}</span>
+                                                </div>
+                                                <div className="data-cell">
+                                                    <label><i className="fa-solid fa-phone"></i> Phone</label>
+                                                    <span>{p.phone || 'N/A'}</span>
+                                                </div>
+                                                <div className="data-cell">
+                                                    <label><i className="fa-solid fa-chart-line"></i> Pipeline</label>
+                                                    <span className={`status-indicator status-${p.status}`}>{p.status}</span>
+                                                </div>
+                                                <div className="data-cell">
+                                                    <label><i className="fa-solid fa-wallet"></i> Budget</label>
+                                                    <span>{p.budget || 'N/A'}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            {p.requirements && (
+                                                <div className="requirements-summary">
+                                                    <label>Major Requirements:</label>
+                                                    <p>{p.requirements}</p>
+                                                </div>
+                                            )}
                                         </div>
-                                        <p><strong>Major Requirement:</strong> {p.interest}{p.interestSubcategory ? ` - ${p.interestSubcategory}` : ''}</p>
                                     </div>
-                                    <div className="item-actions">
-                                        <select value={p.status} onChange={(e) => handleUpdateStatus('demo_requests', p.id, e.target.value)}>
-                                            <option value="received">Received</option>
-                                            <option value="reviewed">Reviewed</option>
-                                            <option value="in-progress">In-Progress</option>
-                                            <option value="finalizing">Finalizing</option>
-                                            <option value="live">Live</option>
-                                            <option value="rejected">Rejected</option>
-                                        </select>
-                                        <button onClick={() => handleDelete('demo_requests', p.id)} className="btn-danger"><i className="fa-solid fa-trash"></i></button>
+                                    
+                                    <div className="item-ctrl">
+                                        <div className="ctrl-group">
+                                            <select value={p.status} onChange={(e) => handleUpdateStatus('demo_requests', p.id, e.target.value)}>
+                                                <option value="received">Received</option>
+                                                <option value="reviewed">Reviewed</option>
+                                                <option value="in-progress">In-Progress</option>
+                                                <option value="finalizing">Finalizing</option>
+                                                <option value="live">Live</option>
+                                                <option value="rejected">Rejected</option>
+                                            </select>
+                                            <button onClick={() => handleDelete('demo_requests', p.id)} className="btn-action-danger" title="Delete request"><i className="fa-solid fa-trash-can"></i></button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
