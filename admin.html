@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Rexplore</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body { background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
         
@@ -155,6 +157,9 @@
             <div class="header">
                 <h1>Rexplore Admin</h1>
                 <div class="header-actions">
+                    <button id="exportExcelBtn" class="btn btn-primary" style="background: #10b981; border-color: #10b981; display: none;">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                    </button>
                     <button id="logoutBtn" class="btn btn-secondary">
                         <i class="fa-solid fa-right-from-bracket"></i> Logout
                     </button>
@@ -195,6 +200,7 @@
         import { getFirestore, collection, query, orderBy, onSnapshot, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         let db, auth;
+        let demoRequestsData = [];
 
         async function init() {
             try {
@@ -239,6 +245,9 @@
                 // Logout Handler
                 document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
+                // Export Handler
+                document.getElementById('exportExcelBtn').onclick = exportToExcel;
+
             } catch (err) {
                 console.error(err);
                 alert("Critical error: " + err.message);
@@ -267,6 +276,14 @@
                     document.querySelectorAll('.data-list').forEach(l => l.classList.remove('active'));
                     tab.classList.add('active');
                     document.getElementById(tab.dataset.target).classList.add('active');
+                    
+                    // Show/Hide Export Button
+                    const exportBtn = document.getElementById('exportExcelBtn');
+                    if (tab.dataset.target === 'demoList') {
+                        exportBtn.style.display = 'flex';
+                    } else {
+                        exportBtn.style.display = 'none';
+                    }
                 };
             });
         }
@@ -277,6 +294,9 @@
             const q = collection(db, collectionName);
             
             onSnapshot(q, (snapshot) => {
+                if (collectionName === "demo_requests") {
+                    demoRequestsData = [];
+                }
                 container.innerHTML = '';
                 if (snapshot.empty) {
                     container.innerHTML = `<p>No ${collectionName.replace('_',' ')} found.</p>`;
@@ -285,6 +305,11 @@
                 snapshot.forEach((docData) => {
                     const data = docData.data();
                     const id = docData.id;
+
+                    if (collectionName === "demo_requests") {
+                        demoRequestsData.push({ id, ...data });
+                    }
+
                     const div = document.createElement('div');
                     div.className = 'admin-item';
                     
@@ -445,6 +470,54 @@
                 });
                 container.appendChild(table);
             });
+        }
+
+        function exportToExcel() {
+            if (demoRequestsData.length === 0) {
+                alert("No data available to export.");
+                return;
+            }
+
+            // Prepare data for Excel
+            const excelData = demoRequestsData.map(item => ({
+                'Tracking ID': item.id,
+                'Status': item.status || 'Received',
+                'Name': item.name,
+                'Email': item.email,
+                'Phone': item.phone || 'N/A',
+                'Interest': item.interest,
+                'Timeline': item.timeline || 'N/A',
+                'Requirements': item.requirements || 'N/A',
+                'Submitted At': item.timestamp?.toDate().toLocaleString() || 'N/A'
+            }));
+
+            // Create Worksheet
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+            
+            // Set Column Widths
+            const wscols = [
+                {wch: 15}, // Tracking ID
+                {wch: 12}, // Status
+                {wch: 20}, // Name
+                {wch: 25}, // Email
+                {wch: 15}, // Phone
+                {wch: 25}, // Interest
+                {wch: 20}, // Timeline
+                {wch: 40}, // Requirements
+                {wch: 20}, // Submitted At
+            ];
+            worksheet['!cols'] = wscols;
+
+            // Create Workbook
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Demo Requests");
+
+            // Generate Filename
+            const date = new Date().toISOString().split('T')[0];
+            const filename = `Rexplore_Demo_Requests_${date}.xlsx`;
+
+            // Download File
+            XLSX.writeFile(workbook, filename);
         }
 
         init();
