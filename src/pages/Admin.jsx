@@ -8,7 +8,7 @@ import * as XLSX from 'xlsx';
 const Admin = () => {
     const { user, isAdmin, logout } = useFirebase();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('testimonials');
+    const [activeTab, setActiveTab] = useState('projects');
     const [testimonials, setTestimonials] = useState([]);
     const [projects, setProjects] = useState([]);
     const [leaderboard, setLeaderboard] = useState([]);

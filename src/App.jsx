@@ -9,6 +9,8 @@ import BookADemo from './pages/BookADemo';
 import Profile from './pages/Profile';
 import Admin from './pages/Admin';
 
+import NotFound from './pages/NotFound';
+
 function App() {
   return (
     <FirebaseProvider>
@@ -21,6 +23,7 @@ function App() {
               <Route path="/book-a-demo" element={<BookADemo />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
           <Footer />
