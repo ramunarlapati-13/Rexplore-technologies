@@ -11,6 +11,7 @@
     <meta name="author" content="Rexplore Technologies">
     <title>Rexplore Technologies - Innovative Technology Solutions</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -33,11 +34,9 @@
                 <li><a href="#team" class="nav-link">Team</a></li>
                 <li><a href="book-a-demo.html" class="nav-link">Book a Demo</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
-                <li id="authNavItem">
-                    <button id="loginBtn" class="btn btn-secondary"
-                        style="padding: 0.5rem 1.5rem; font-size: 0.9rem; margin-left: 1rem;">Log In</button>
-                    <a href="profile.html" id="profileLink" class="nav-link"
-                        style="display:none; font-weight: 700; color: var(--primary-light);">Profile</a>
+                <li id="authNavItem" class="auth-nav-item">
+                    <button id="loginBtn" class="btn btn-secondary auth-btn">Log In</button>
+                    <a href="profile.html" id="profileLink" class="nav-link profile-link">Profile</a>
                 </li>
             </ul>
             <div class="hamburger" id="hamburger">
@@ -425,6 +424,9 @@
                         <input type="email" id="email" name="email" placeholder="Your Email" required>
                     </div>
                     <div class="form-group">
+                        <input type="tel" id="phone" name="phone" placeholder="Mobile Number" required>
+                    </div>
+                    <div class="form-group">
                         <input type="text" id="subject" name="subject" placeholder="Subject" required>
                     </div>
                     <div class="form-group">
@@ -507,23 +509,19 @@
         </div>
     </div>
 
-    <!-- Floating Track Button -->
-    <button class="floating-track-btn" id="openTrackModal">
-        <span class="track-label">Track Your Request</span>
-        🔍
-    </button>
-
     <!-- Tracking Modal -->
     <div id="trackModal" class="success-modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <h3 style="margin-bottom: 1rem;">Track Your Request</h3>
-            <p style="margin-bottom: 1.5rem;">Enter your internal tracking ID to see the current status of your project
-                brief or demo request.</p>
+        <div class="modal-content tracking-modal-box">
+            <div class="modal-header">
+                <h3>Track Your Request</h3>
+                <p>Enter your internal tracking ID to see the current status of your project or demo request.</p>
+            </div>
 
             <div class="tracking-input-group">
-                <input type="text" id="trackingIdInput" placeholder="EX: 7XzR... (Tracking ID)"
-                    style="flex: 1; padding: 0.8rem; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid rgba(255,255,255,0.1); color: white;">
-                <button id="trackBtn" class="btn btn-primary" style="padding: 0.8rem 1.5rem;">Search</button>
+                <input type="text" id="trackingIdInput" placeholder="EX: 7XzR... (Tracking ID)">
+                <button id="trackBtn" class="btn btn-primary">
+                    <i class="fa-solid fa-magnifying-glass"></i> Search
+                </button>
             </div>
 
             <div id="trackingResult" class="tracking-result">
@@ -554,26 +552,58 @@
                 </div>
 
                 <div class="track-details">
-                    <p><strong>Request Name:</strong> <span id="trackName"></span></p>
-                    <p><strong>Service:</strong> <span id="trackService"></span></p>
-                    <p><strong>Timeline:</strong> <span id="trackTimeline"></span></p>
-                    <p id="liveStatusLink"
-                        style="display: none; color: var(--success-color); font-weight: bold; margin-bottom: 10px;">🎉
-                        Your request is now live!</p>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Last Updated: <span
-                            id="trackTime"></span></p>
+                    <div class="track-info-row">
+                        <span class="label">Request Name</span>
+                        <span id="trackName" class="value"></span>
+                    </div>
+                    <div class="track-info-row">
+                        <span class="label">Service</span>
+                        <span id="trackService" class="value"></span>
+                    </div>
+                    <div class="track-info-row">
+                        <span class="label">Timeline</span>
+                        <span id="trackTimeline" class="value"></span>
+                    </div>
+                    
+                    <p id="liveStatusLink" class="live-status-alert">
+                       <i class="fa-solid fa-circle-check"></i> Your request is now live!
+                    </p>
+                    
+                    <div class="track-footer">
+                        <span>Last Updated: <span id="trackTime"></span></span>
+                    </div>
                 </div>
             </div>
 
-            <div id="trackError"
-                style="color: #ef4444; display: none; margin-top: 1rem; font-size: 0.8rem; line-height: 1.4;">
-                Invalid ID. Please re-enter correctly.<br>
-                <span style="font-size: 0.7rem; opacity: 0.8;">Note: IDs are case-sensitive (capital/small letters
-                    matter).</span>
+            <div id="trackError" class="track-error-msg">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <div>
+                    <strong>Invalid ID</strong>
+                    <span>Please re-enter correctly (IDs are case-sensitive).</span>
+                </div>
             </div>
 
-            <button class="modal-btn" onclick="closeTrackModal()" style="margin-top: 2rem;">Close</button>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-full" onclick="closeTrackModal()">Close Tracking</button>
+            </div>
         </div>
+    </div>
+
+    <!-- Tracking Dock (Bottom Left) -->
+    <div class="tracking-dock">
+        <!-- Web Tracking Button -->
+        <button class="dock-item web-track" id="openTrackModal" title="Web Tracking">
+            <span class="dock-tooltip">Web Tracking</span>
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+
+        <!-- Telegram Tracking Button -->
+        <a href="https://t.me/rexplorebot" target="_blank" class="dock-item telegram-track" title="Telegram Tracking">
+            <div class="telegram-pulse"></div>
+            <i class="fab fa-telegram-plane"></i>
+            <span class="dock-tooltip">Telegram Bot</span>
+            <span class="dock-badge">NEW 🤖</span>
+        </a>
     </div>
 
     <script type="module" src="script.js"></script>

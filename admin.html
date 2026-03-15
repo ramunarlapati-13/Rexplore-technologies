@@ -71,9 +71,66 @@
         .data-list { display: none; }
         .data-list.active { display: block; }
 
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .display-status-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .display-status-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
         @keyframes fadeInScale {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            #adminDashboard { padding: 1rem; }
+            .header { flex-direction: column; gap: 1.5rem; align-items: stretch; text-align: center; }
+            .header h1 { font-size: 1.8rem; }
+            .header-actions { justify-content: center; }
+            
+            .tabs { overflow-x: auto; white-space: nowrap; padding-bottom: 0.5rem; -webkit-overflow-scrolling: touch; }
+            .tab-btn { font-size: 1rem; padding: 0.5rem 0.8rem; }
+
+            .admin-item { 
+                flex-direction: column; 
+                align-items: stretch; 
+                gap: 1.5rem; 
+                padding: 1.25rem;
+            }
+            .item-actions {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+                gap: 1rem;
+            }
+            .display-status-group select {
+                width: 100%;
+            }
+            .delete-btn {
+                width: 100%;
+                justify-content: center;
+                display: flex;
+            }
+            
+            .login-card { padding: 2rem 1.5rem; margin: 0 1rem; width: calc(100% - 2rem); }
         }
     </style>
 </head>
@@ -97,9 +154,13 @@
         <div class="admin-container">
             <div class="header">
                 <h1>Rexplore Admin</h1>
-                <div style="display: flex; gap: 1rem;">
-                    <button id="logoutBtn" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Logout</button>
-                    <a href="index.html" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Back to Site</a>
+                <div class="header-actions">
+                    <button id="logoutBtn" class="btn btn-secondary">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
+                    <a href="index.html" class="btn btn-secondary">
+                        <i class="fa-solid fa-house"></i> Site
+                    </a>
                 </div>
             </div>
 
@@ -231,50 +292,67 @@
                     if (collectionName === "testimonials") {
                         content = `
                             <div class="item-info">
-                                <h4>${data.name} (${data.rating} Stars)</h4>
-                                <p>"${data.text}"</p>
-                                <div style="margin: 10px 0;">
-                                    <strong>Display Status:</strong> 
-                                    <select class="status-update" data-id="${id}" data-col="testimonials" style="padding: 5px; background: var(--bg-tertiary); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;">
+                                <h4 style="font-size: 1.2rem; margin-bottom: 0.5rem;">${data.name} <span style="font-size: 0.9rem; color: var(--warning-color); font-weight: 500;">(${data.rating} Stars)</span></h4>
+                                <p style="font-style: italic; opacity: 0.9; margin-bottom: 1rem;">"${data.text}"</p>
+                                <div class="meta">${data.timestamp?.toDate().toLocaleString() || 'No Date'}</div>
+                            </div>
+                            <div class="item-actions">
+                                <div class="display-status-group">
+                                    <label>Display Status</label>
+                                    <select class="status-update form-control-professional" data-id="${id}" data-col="testimonials" style="padding: 0.6rem 2.5rem 0.6rem 1rem; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;">
                                         <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>Pending</option>
-                                        <option value="approved" ${data.status === 'approved' ? 'selected' : ''}>Approved (Public)</option>
+                                        <option value="approved" ${data.status === 'approved' ? 'selected' : ''}>Approved</option>
                                         <option value="hidden" ${data.status === 'hidden' ? 'selected' : ''}>Hidden</option>
                                     </select>
                                 </div>
-                                <div class="meta">${data.timestamp?.toDate().toLocaleString() || ''}</div>
+                                <button class="btn btn-danger delete-btn" data-id="${id}" data-col="${collectionName}">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
                             </div>
                         `;
                     } else {
                         content = `
                             <div class="item-info">
-                                <h4>${data.name} - ${data.interest}</h4>
-                                <p><strong>ID:</strong> <code style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:3px;">${id}</code> 
-                                    <button onclick="copyToClipboard('${id}')" style="background:none; border:none; color:var(--primary-color); cursor:pointer; font-size:0.8rem; margin-left:5px;">📋 Copy</button>
-                                </p>
-                                 <p><strong>Email:</strong> ${data.email}</p>
-                                <p><strong>UID:</strong> <span style="font-size: 0.75rem; color: ${data.uid ? 'var(--success-color)' : 'var(--text-muted)'}">${data.uid || 'Anonymous/Legacy'}</span></p>
-                                <p><strong>Requirements:</strong> ${data.requirements}</p>
-                                <p><strong>Referral:</strong> ${data.referral}</p>
-                                <div style="margin: 10px 0;">
-                                    <strong>Status:</strong> 
-                                    <select class="status-update" data-id="${id}" data-col="demo_requests" style="padding: 5px; background: var(--bg-tertiary); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                                    <div>
+                                        <h4 style="font-size: 1.2rem;">${data.name}</h4>
+                                        <div class="meta" style="margin-top: 4px;"> Interest: ${data.interest}</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <code style="background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.1);">${id}</code>
+                                        <button onclick="copyToClipboard('${id}')" class="btn btn-secondary" style="padding: 0.3rem 0.8rem; font-size: 0.75rem; margin-left: 5px;">Copy</button>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                                    <p><strong>Email:</strong> ${data.email}</p>
+                                    <p><strong>Phone:</strong> ${data.phone || 'N/A'}</p>
+                                    <p><strong>Timeline:</strong> ${data.timeline || 'N/A'}</p>
+                                    <p><strong>Budget:</strong> ${data.budget || 'N/A'}</p>
+                                </div>
+                                
+                                <p style="margin-bottom: 0.5rem;"><strong>Requirements:</strong><br><span style="opacity: 0.8;">${data.requirements}</span></p>
+                                <div class="meta" style="margin-top: 1rem;">${data.timestamp?.toDate().toLocaleString() || 'No Date'}</div>
+                            </div>
+                            <div class="item-actions">
+                                <div class="display-status-group">
+                                    <label>Step Status</label>
+                                    <select class="status-update form-control-professional" data-id="${id}" data-col="demo_requests" style="padding: 0.6rem 2.5rem 0.6rem 1rem; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;">
                                         <option value="received" ${(data.status === 'received' || data.status === 'pending') ? 'selected' : ''}>Received</option>
                                         <option value="reviewed" ${data.status === 'reviewed' ? 'selected' : ''}>Reviewed</option>
-                                        <option value="in-progress" ${data.status === 'in-progress' ? 'selected' : ''}>In-progress</option>
+                                        <option value="in-progress" ${data.status === 'in-progress' ? 'selected' : ''}>In-Progress</option>
                                         <option value="finalizing" ${data.status === 'finalizing' ? 'selected' : ''}>Finalizing</option>
-                                        <option value="live" ${data.status === 'live' ? 'selected' : ''}>Request is Live</option>
+                                        <option value="live" ${data.status === 'live' ? 'selected' : ''}>Live</option>
                                         <option value="rejected" ${data.status === 'rejected' ? 'selected' : ''}>Rejected</option>
                                     </select>
                                 </div>
-                                <div class="meta">${data.timestamp?.toDate().toLocaleString() || ''}</div>
+                                <button class="btn btn-danger delete-btn" data-id="${id}" data-col="${collectionName}">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
                             </div>
                         `;
                     }
-                    
-                    div.innerHTML = `
-                        ${content}
-                        <button class="delete-btn" data-id="${id}" data-col="${collectionName}">Delete</button>
-                    `;
+                    div.innerHTML = content;
                     container.appendChild(div);
                 });
 

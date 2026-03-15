@@ -166,12 +166,13 @@ contactForm.addEventListener('submit', async (e) => {
     const formData = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
         subject: document.getElementById('subject').value,
         message: document.getElementById('message').value
     };
 
     // Basic validation
-    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+    if (!formData.name || !formData.email || !formData.phone || !formData.subject || !formData.message) {
         showFormMessage('Please fill in all fields.', 'error');
         return;
     }
@@ -677,32 +678,13 @@ if (trackBtn) {
         }
 
         function showError(msg) {
-            trackError.innerHTML = msg || "Invalid ID. Please re-enter correctly.";
-            trackError.style.display = 'block';
+            trackError.style.display = 'flex';
             trackingResult.style.display = 'none';
         }
 
         function renderTrackingData(data) {
             trackingResult.style.display = 'block';
             trackError.style.display = 'none';
-            
-            // Add ID display with copy button
-            const idHeader = `
-                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                    <span style="font-size: 0.8rem; color: var(--text-muted);">Tracking ID:</span>
-                    <code style="background: rgba(99, 102, 241, 0.1); padding: 4px 10px; border-radius: 6px; color: var(--primary-light); font-weight: 700; font-family: monospace;">${inputId}</code>
-                    <button onclick="copyText('${inputId}', 'Tracking ID')" style="background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); cursor: pointer; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;">📋 Copy</button>
-                </div>
-            `;
-            
-            // Prepend the ID header to the details
-            const detailsBox = document.querySelector('.track-details');
-            if (detailsBox && !document.getElementById('trackIdDisplay')) {
-                const headerDiv = document.createElement('div');
-                headerDiv.id = 'trackIdDisplay';
-                headerDiv.innerHTML = idHeader;
-                trackingResult.insertBefore(headerDiv, detailsBox);
-            }
 
             document.getElementById('trackName').textContent = data.name || 'N/A';
             document.getElementById('trackService').textContent = data.interest || 'N/A';
@@ -711,25 +693,28 @@ if (trackBtn) {
             const timestamp = data.timestamp?.toDate();
             document.getElementById('trackTime').textContent = timestamp ? timestamp.toLocaleString() : 'Recent';
             
-            // Map 'pending' to 'received' for old records
-            const status = (data.status === 'pending') ? 'received' : (data.status || 'received');
+            // Map legacy statuses
+            let status = data.status || 'received';
+            if (status === 'pending') status = 'received';
+            
             updateRoadmap(status);
         }
-
-        window.copyText = (text, type = 'Content') => {
-            navigator.clipboard.writeText(text).then(() => {
-                const toast = document.createElement('div');
-                toast.style = "position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #6366f1; color: white; padding: 10px 25px; border-radius: 30px; font-size: 0.85rem; z-index: 10000; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease;";
-                toast.innerHTML = `✓ ${type} Copied!`;
-                document.body.appendChild(toast);
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    setTimeout(() => toast.remove(), 300);
-                }, 2500);
-            });
-        };
     };
 }
+
+window.copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+        const toast = document.createElement('div');
+        toast.className = 'copy-toast';
+        toast.innerHTML = `<i class="fa-solid fa-check"></i> Copied to clipboard!`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.classList.add('active'), 10);
+        setTimeout(() => {
+            toast.classList.remove('active');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    });
+};
 
 // ================================
 // INITIALIZE
