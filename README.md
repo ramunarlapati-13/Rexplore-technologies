@@ -1,98 +1,69 @@
-# Rexplore Technologies - Enterprise Digital Solutions
+# Rexplore Technologies - Enterprise Digital Solutions (React Port)
 
-A high-performance, premium company website for Rexplore Technologies. Built with a focus on modern aesthetics (Glassmorphism), real-time data synchronization, and a comprehensive client-to-admin workflow powered by Firebase.
+A high-performance, premium company website for Rexplore Technologies, now migrated to React for enhanced component architecture and state management. Built with a focus on modern aesthetics (Glassmorphism), real-time data synchronization, and a comprehensive client-to-admin workflow powered by Firebase.
 
 ## 🚀 Key Implementations
 
-### 1. Unified Client Portal & Tracking
+### 1. Modern React Architecture
+*   **Vite Build Tool**: Ultra-fast development and build process.
+*   **React Router**: Seamless Single Page Application (SPA) navigation.
+*   **Context API**: Global state management for Firebase Authentication and user roles.
+*   **Component-Based UI**: Reusable components for Navbar, Footer, Tracking Dock, and Modals.
+
+### 2. Unified Client Portal & Tracking
 *   **Tracking Dock (Bottom-Left)**: A floating interactive dock providing quick access to tracking tools.
-*   **Unique Tracking IDs**: Every project brief or demo request generates a unique 8-character alphanumeric ID (e.g., `7XzR9A2B`) for real-time status monitoring.
+*   **Unique Tracking IDs**: Every project brief or demo request generates a unique Firestore document ID for real-time status monitoring.
 *   **Web Tracking Modal**: Integrated roadmap visualization showing project progress (Received → Reviewed → In-Progress → Finalizing → Live).
 *   **Telegram Bot Integration**: Direct link to the `@rexplorebot` for mobile-native tracking and support.
 
-### 2. Intelligent Project Briefing System
-*   **Branching Form Logic**: Dynamic form fields in `book-a-demo.html` that adapt based on the selected service (e.g., specific options for Web Development vs. Mobile Apps).
-*   **Firebase Authentication**: Secure Google Sign-In required for submitting briefs, ensuring verified client identities.
-*   **Comprehensive Data Capture**: Collects project goals, budget ranges (**Under $1k - $10k+**), timelines, design preferences, and contact details including validated **Mobile Numbers**.
-
-### 3. User Personalization (Client Profile)
-*   **Profile Page (`profile.html`)**: A dedicated dashboard for clients to:
-    *   View their entire project history and current statuses.
-    *   Access their personal **Referral Link**.
-    *   Track referral performance (Client stats).
-*   **Referral System**: Automated referral tracking where users can share their link (`?ref=email`) to earn rewards/benefits, tracked in the backend.
+### 3. Intelligent Project Briefing System
+*   **Dynamic Forms**: React-controlled form components that capture project goals, budget ranges (**Under $1k - $10k+**), timelines, and contact details including validated **Mobile Numbers**.
+*   **Firebase Integration**: Secure Google Sign-In and real-time Firestore updates.
 
 ### 4. Robust Admin Ecosystem
-*   **Admin Dashboard (`admin.html`)**: A secure, real-time command center for managing:
-    *   **Project Management**: Track projects from "Received" to "Live" with full control over statuses and client data (Name, Email, Mobile, Budget).
-    *   **Testimonials**: Approve or hide public reviews before they appear on the homepage.
-    *   **Excel Reporting**: One-click generation of professional project reports in `.xlsx` format for offline analysis.
-*   **Multi-Channel Alerts**: 
-    *   **Telegram Admin Alerts**: Instant notifications containing client info, interest, mobile, and budget for immediate follow-up.
-    *   **FormSubmit Emails**: Detailed project summaries sent to admin email for archival.
-    *   **Auto-Replies**: Professional HTML emails sent to clients via **EmailJS** immediately after submission.
-
-### 5. Design & Performance
-*   **Premium UI**: Custom-built using Vanilla CSS with CSS Grid/Flexbox, featuring backdrop filters, glowing shadows, and sleek gradients.
-*   **Font Awesome 6**: Professional icon set integration.
-*   **Optimized Assets**: Fast-loading assets and optimized script execution.
+*   **Admin Dashboard**: A secure, real-time command center for managing projects, approving testimonials, and exporting data.
+*   **Excel Reporting**: One-click generation of professional project reports in `.xlsx` format using **XLSX (SheetJS)**.
 
 ## 📁 Project Architecture
 
 ```
 Rexplore-technologies/
-├── index.html            # Main Landing Page & Tracking Interface
-├── book-a-demo.html      # Dynamic Project Briefing Portal
-├── profile.html          # Client Dashboard & Referral Center
-├── admin.html            # Real-time Admin Control Panel
-├── styles.css            # Global Design System (2000+ lines of custom CSS)
-├── script.js             # Core Frontend Logic & Firebase Handlers
-├── firestore.rules       # Granular Security Rules (UID-based protection)
-├── firestore.indexes.json# Optimized Query Indexes
-└── assets/               # Branding, Logos, and Premium Images
+├── src/
+│   ├── components/       # Reusable UI elements (Navbar, Footer, etc.)
+│   ├── context/          # Global state (FirebaseContext)
+│   ├── pages/            # Page components (Home, BookADemo, Admin, etc.)
+│   ├── assets/           # Local styling and assets
+│   ├── App.jsx           # Main routing and layout
+│   └── main.jsx          # Entry point
+├── public/               # Static assets (logo, illustrations)
+├── index.html            # React root template
+├── vite.config.js        # Vite configuration
+└── package.json          # Dependencies and scripts
 ```
 
 ## ⚙️ Technology Stack
 
-The Rexplore ecosystem is built on a modern, scalable, and high-performance stack designed for real-time interaction and security.
+- **Frontend**: React 18, React Router 6, Vite, Vanilla CSS
+- **Backend**: Firebase (Firestore, Auth)
+- **Email**: EmailJS
+- **Reporting**: XLSX (SheetJS)
+- **Icons**: Font Awesome 6
 
-### 🎨 Frontend Architecture
-- **Semantic HTML5**: Structured for optimal SEO and web accessibility (A11y).
-- **Vanilla CSS3 (Advanced)**: A custom-engineered design system featuring:
-    - **Glassmorphism**: Sophisticated backdrop-filter effects for a premium feel.
-    - **Global Design Tokens**: Centrally managed CSS variables for colors, spacing, and typography.
-    - **Mobile-First Responsiveness**: Tailored media queries for seamless transition across all screen sizes.
-    - **Dynamic Animations**: Hand-crafted keyframe animations for headers, cards, and interactive buttons.
-- **JavaScript (ES6+)**: Modular script architecture handling real-time data binding, DOM manipulation, and tracking logic.
+## 🛠️ Setup & Run
 
-### ☁️ Cloud & Backend (BaaS)
-- **Google Firebase**:
-    - **Cloud Firestore**: High-performance NoSQL database for real-time project synchronization.
-    - **Firebase Authentication**: Enterprise-grade security using Google OAuth 2.0 for client identity verification.
-    - **Security Rules**: Granular, UID-based data protection policies to ensure data privacy and integrity.
-
-### 🛰️ Enterprise Integrations
-- **Telegram Bot API**: Instant real-time notifications for admins, enabling rapid response to new leads.
-- **XLSX (SheetJS)**: Integration for client-side generation and download of professional Excel project reports.
-- **EmailJS SDK**: High-reliability transactional email delivery for automated client follow-ups.
-- **FormSubmit.co**: Encrypted background email service for administrative data archival.
-- **Font Awesome 6 Pro**: Professional vector icon library for crisp, high-resolution visual cues.
-- **Google Fonts**: Modern typography (Inter/Outfit) for enhanced readability and aesthetics.
-
-## 🛠️ Setup & Customization
-
-### Firebase Security Rules
-The project uses advanced security rules. Ensure `firestore.rules` is deployed to prevent unauthorized data access:
-```js
-match /demo_requests/{docId} {
-  allow read: if request.auth != null && (request.auth.uid == resource.data.uid || isAdmin());
-  allow create: if request.auth != null;
-}
-```
-
-### Environment Configuration
-The project is set up to handle both local development and production. Firebase configurations are dynamically fetched inside `initDemo()` or fall back to pre-configured values in the scripts.
-
----
+1.  **Clone the repository**
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
+3.  **Run locally**:
+    ```bash
+    npm run dev
+    ```
+4.  **Build for production**:
+    ```bash
+    npm run build
+    ```
 
 Built with ❤️ for Rexplore Technologies | Innovative Tech Solutions
+
