@@ -53,13 +53,30 @@ Rexplore-technologies/
 ```
 
 ## ⚙️ Technology Stack
-- **Frontend**: HTML5, Vanilla CSS3 (Custom Design System), JavaScript (ES6+).
-- **Backend-as-a-Service**: Firebase (Firestore, Auth, Hosting).
-- **Integrations**: 
-    - **Telegram API**: Real-time admin notifications.
-    - **EmailJS**: Automated Client Auto-responders.
-    - **FormSubmit**: Background Admin Email Alerts.
-    - **Font Awesome**: Advanced Vector Icons.
+
+The Rexplore ecosystem is built on a modern, scalable, and high-performance stack designed for real-time interaction and security.
+
+### 🎨 Frontend Architecture
+- **Semantic HTML5**: Structured for optimal SEO and web accessibility (A11y).
+- **Vanilla CSS3 (Advanced)**: A custom-engineered design system featuring:
+    - **Glassmorphism**: Sophisticated backdrop-filter effects for a premium feel.
+    - **Global Design Tokens**: Centrally managed CSS variables for colors, spacing, and typography.
+    - **Mobile-First Responsiveness**: Tailored media queries for seamless transition across all screen sizes.
+    - **Dynamic Animations**: Hand-crafted keyframe animations for headers, cards, and interactive buttons.
+- **JavaScript (ES6+)**: Modular script architecture handling real-time data binding, DOM manipulation, and tracking logic.
+
+### ☁️ Cloud & Backend (BaaS)
+- **Google Firebase**:
+    - **Cloud Firestore**: High-performance NoSQL database for real-time project synchronization.
+    - **Firebase Authentication**: Enterprise-grade security using Google OAuth 2.0 for client identity verification.
+    - **Security Rules**: Granular, UID-based data protection policies to ensure data privacy and integrity.
+
+### 🛰️ Enterprise Integrations
+- **Telegram Bot API**: Instant real-time notifications for admins, enabling rapid response to new leads.
+- **EmailJS SDK**: High-reliability transactional email delivery for automated client follow-ups.
+- **FormSubmit.co**: Encrypted background email service for administrative data archival.
+- **Font Awesome 6 Pro**: Professional vector icon library for crisp, high-resolution visual cues.
+- **Google Fonts**: Modern typography (Inter/Outfit) for enhanced readability and aesthetics.
 
 ## 🛠️ Setup & Customization
 
